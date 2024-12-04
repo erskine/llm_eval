@@ -1,8 +1,7 @@
-import aisuite as ai
-import time
-from dataclasses import dataclass, asdict
-from typing import List, Dict, Any
+import requests
 import json
+from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class Experiment:
@@ -10,48 +9,16 @@ class Experiment:
     user_prompt: str
     models: List[str]
 
-@dataclass
-class ExperimentResult:
-    model: str
-    system_prompt: str
-    user_prompt: str
-    response: str
-    elapsed_time: float
-
-def run_experiment(experiment: Experiment) -> Dict[str, Any]:
-    """
-    Execute an experiment and return results in a JSON-serializable format.
-    """
-    client = ai.Client()
-    results = []
+def run_experiment_via_api(experiment: Experiment) -> None:
+    url = "http://127.0.0.1:8000/run_experiment/"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, data=json.dumps(experiment.__dict__))
     
-    messages = [
-        {"role": "system", "content": experiment.system_prompt},
-        {"role": "user", "content": experiment.user_prompt},
-    ]
-    
-    for model in experiment.models:
-        start_time = time.time()
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=0.7  # Fixed temperature for now
-        )
-        elapsed_time = time.time() - start_time
-        
-        results.append(ExperimentResult(
-            model=model,
-            system_prompt=experiment.system_prompt,
-            user_prompt=experiment.user_prompt,
-            response=response.choices[0].message.content,
-            elapsed_time=elapsed_time
-        ))
-    
-    # Convert to JSON-serializable format
-    return {
-        "experiment_config": asdict(experiment),
-        "results": [asdict(r) for r in results]
-    }
+    if response.status_code == 200:
+        results = response.json()
+        print(json.dumps(results, indent=2))
+    else:
+        print(f"Failed to run experiment: {response.status_code} - {response.text}")
 
 def main():
     # Example usage
@@ -61,10 +28,7 @@ def main():
         models=["openai:gpt-4o-mini", "anthropic:claude-3-5-haiku-20241022"]
     )
     
-    results = run_experiment(experiment)
-    
-    # Pretty print JSON output
-    print(json.dumps(results, indent=2))
+    run_experiment_via_api(experiment)
 
 if __name__ == "__main__":
     main()
