@@ -17,7 +17,7 @@ import requests
 import json
 
 def run_experiment(experiment_data):
-    url = "http://127.0.0.1:8000/run_experiment/"
+    url = "http://localhost:8000/run_experiment/"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=experiment_data)
     return response.json() if response.status_code == 200 else None

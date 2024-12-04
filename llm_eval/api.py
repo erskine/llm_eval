@@ -17,6 +17,10 @@ from pydantic import BaseModel
 from typing import List
 import time
 import aisuite as ai
+from dotenv import load_dotenv
+
+# Load environment variables at startup
+load_dotenv()
 
 app = FastAPI()
 
