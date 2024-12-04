@@ -28,8 +28,12 @@ RUN poetry install --no-root
 # Copy the rest of the application
 COPY . .
 
-# Make start.sh executable
-RUN chmod +x start.sh
+# Make start.sh executable and set correct permissions
+RUN chmod +x start.sh && \
+    mkdir -p /root/.streamlit && \
+    touch /root/.streamlit/secrets.toml && \
+    chown -R vscode:vscode /app && \
+    chown -R vscode:vscode /root/.streamlit
 
 # Set up supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -40,4 +44,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Set supervisor as the entrypoint
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-#
+# Create log directory with proper permissions
+RUN mkdir -p /var/log/supervisor && \
+    chown -R vscode:vscode /var/log/supervisor
+
