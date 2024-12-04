@@ -95,3 +95,15 @@ llm-eval/
 
 3. Container issues:
    - Try rebuilding the container: F1 → "Remote-Containers: Rebuild Container"
+
+## Testing
+
+### Prerequisites
+- Make sure you have Poetry installed
+- All development dependencies are installed: `poetry install`
+
+### Running Tests
+To run all tests:
+```bash
+poetry run pytest
+```
