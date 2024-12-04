@@ -10,11 +10,31 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 # Install Poetry
 ENV POETRY_HOME=/opt/poetry
+
 RUN curl -sSL https://install.python-poetry.org | python3 - \
     && ln -s /opt/poetry/bin/poetry /usr/local/bin/poetry
 
 # Configure Poetry to create virtual environment inside project directory
 RUN poetry config virtualenvs.in-project true
+
+# Create service users and groups
+RUN groupadd -r streamlit && \
+    useradd -r -g streamlit -m streamlit && \
+    mkdir -p /home/streamlit/.streamlit && \
+    # Create and populate credentials.toml with default values
+    echo '[general]\nemail = ""\n' > /home/streamlit/.streamlit/credentials.toml && \
+    touch /home/streamlit/.streamlit/secrets.toml && \
+    touch /home/streamlit/.streamlit/config.toml && \
+    chown -R streamlit:streamlit /home/streamlit/.streamlit && \
+    chmod -R 700 /home/streamlit/.streamlit && \
+    groupadd -r uvicorn && \
+    useradd -r -g uvicorn -m uvicorn && \
+    # Add service users to vscode group for development
+    usermod -a -G vscode streamlit && \
+    usermod -a -G vscode uvicorn && \
+    # Add vscode user to service groups for development
+    usermod -a -G streamlit vscode && \
+    usermod -a -G uvicorn vscode
 
 # Set working directory
 WORKDIR /app
@@ -28,12 +48,19 @@ RUN poetry install --no-root
 # Copy the rest of the application
 COPY . .
 
-# Make start.sh executable and set correct permissions
+# Set up permissions
 RUN chmod +x start.sh && \
-    mkdir -p /root/.streamlit && \
-    touch /root/.streamlit/secrets.toml && \
-    chown -R vscode:vscode /app && \
-    chown -R vscode:vscode /root/.streamlit
+    # Make app readable by all users
+    chmod -R 755 /app && \
+    # Make virtual environment accessible by all users
+    chown -R root:root /app/.venv && \
+    chmod -R 755 /app/.venv && \
+    # Set specific ownership for streamlit config
+    chown -R streamlit:streamlit /home/streamlit/.streamlit && \
+    chmod -R 750 /home/streamlit/.streamlit && \
+    # Ensure vscode user can access everything in dev mode
+    mkdir -p /home/vscode/.streamlit && \
+    chown -R vscode:vscode /home/vscode/.streamlit
 
 # Set up supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -41,10 +68,14 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Add virtual environment to PATH
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Set supervisor as the entrypoint
-ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
 # Create log directory with proper permissions
 RUN mkdir -p /var/log/supervisor && \
-    chown -R vscode:vscode /var/log/supervisor
+    chown -R root:root /var/log/supervisor && \
+    chmod -R 755 /var/log/supervisor
+
+# Set environment variable for Streamlit home directory
+ENV STREAMLIT_HOME_PATH=/home/streamlit/.streamlit
+
+# Set supervisor as the entrypoint
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 

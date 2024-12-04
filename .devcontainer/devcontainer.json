@@ -20,7 +20,8 @@
                         "path": "bash",
                         "icon": "terminal-bash"
                     }
-                }
+                },
+                "python.defaultInterpreterPath": "/app/.venv/bin/python"
             }
         }
     },
@@ -33,5 +34,6 @@
     "forwardPorts": [8000, 8501],
     "postCreateCommand": "poetry install",
     "postStartCommand": "tail -f /var/log/supervisor/llm_eval*.log",
-    "overrideCommand": false
+    "overrideCommand": false,
+    "updateRemoteUserUID": true
 }
