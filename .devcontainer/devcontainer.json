@@ -3,6 +3,8 @@
     "build": {
         "dockerfile": "../Dockerfile"
     },
+    // Use remote user to ensure correct permissions
+    "remoteUser": "vscode",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -14,7 +16,12 @@
             ]
         }
     },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": false
+        }
+    },
     "forwardPorts": [],
-    "postCreateCommand": "poetry install",
-    "remoteUser": "vscode"
-} 
+    "postCreateCommand": "poetry install"
+}
