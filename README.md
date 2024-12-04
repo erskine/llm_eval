@@ -6,7 +6,7 @@ A tool for running comparative experiments across different LLM models using Fas
 
 ### Prerequisites
 
-- [Visual Studio Code](https://code.visualstudio.com/)
+- [Visual Studio Code](https://code.visualstudio.com/) or [Cursor](https://www.cursor.com/)
 - [Docker](https://www.docker.com/products/docker-desktop/)
 - [VS Code Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
@@ -49,17 +49,18 @@ The application consists of two components that need to be running simultaneousl
 
 ### Project Structure
 
+```
 llm-eval/
-├── .devcontainer/ # Development container configuration
-│ └── devcontainer.json
+├── .devcontainer/          # Development container configuration
+│   └── devcontainer.json
 ├── llm_eval/
-│ ├── api.py # FastAPI server
-│ ├── client.py # Python client for API
-│ └── ui.py # Streamlit user interface
-├── Dockerfile # Development container definition
-├── pyproject.toml # Poetry dependency management
+│   ├── api.py             # FastAPI server
+│   ├── client.py          # Python client for API
+│   └── ui.py              # Streamlit user interface
+├── Dockerfile             # Development container definition
+├── pyproject.toml         # Poetry dependency management
 └── README.md
-
+```
 
 ### Using the Application
 
