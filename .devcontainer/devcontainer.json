@@ -3,17 +3,25 @@
     "build": {
         "dockerfile": "../Dockerfile"
     },
-    // Use remote user to ensure correct permissions
     "remoteUser": "vscode",
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
-                "ms-vscode.vscode-typescript-tslint-plugin",
+                "ms-python.vscode-typescript-tslint-plugin",
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode"
-            ]
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "bash",
+                        "icon": "terminal-bash"
+                    }
+                }
+            }
         }
     },
     "features": {
@@ -22,6 +30,8 @@
             "ppa": false
         }
     },
-    "forwardPorts": [],
-    "postCreateCommand": "poetry install"
+    "forwardPorts": [8000, 8501],
+    "postCreateCommand": "poetry install",
+    "postStartCommand": "tail -f /var/log/supervisor/llm_eval*.log",
+    "overrideCommand": false
 }

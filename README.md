@@ -14,7 +14,7 @@ A tool for running comparative experiments across different LLM models using Fas
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/erskine/llm_eval.git
    cd llm-eval
    ```
 
@@ -32,7 +32,17 @@ A tool for running comparative experiments across different LLM models using Fas
 
 ### Running the Application
 
-The application consists of two components that need to be running simultaneously:
+The application starts automatically when the development container launches.
+
+If you need to restart the application, you can use the provided shell script:
+
+```bash
+./start.sh
+```
+
+This will launch both the FastAPI server and Streamlit UI simultaneously.
+
+Alternatively, you can start the components manually:
 
 1. Start the FastAPI server:
    ```bash

@@ -31,7 +31,13 @@ COPY . .
 # Make start.sh executable
 RUN chmod +x start.sh
 
+# Set up supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Add virtual environment to PATH
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Set supervisor as the entrypoint
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 #
