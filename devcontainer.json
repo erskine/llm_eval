@@ -1,0 +1,10 @@
+{
+  "name": "llm_eval",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "postCreateCommand": "poetry install",
+  "postAttachCommand": {
+    "add-aliases": "echo 'alias llm_eval=\"sudo /app/llm_eval/scripts/service.sh\"' >> ~/.bashrc && source ~/.bashrc"
+  },
+  "postStartCommand": "tail -f /var/log/supervisor/llm_eval*.log"
+} 
