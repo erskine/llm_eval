@@ -13,9 +13,15 @@ This project uses a containerized environment with two main services:
 
 ### Getting Started
 1. Clone the repository
-2. Open in VS Code
-3. When prompted, click "Reopen in Container"
-4. The container will build and start both services automatically
+2. Create a `.env` file in the project root with your API credentials:
+   ```
+   OPENAI_API_KEY=your_openai_key_here
+   ANTHROPIC_API_KEY=your_anthropic_key_here
+   # Add any other required API keys
+   ```
+3. Open in VS Code
+4. When prompted, click "Reopen in Container"
+5. The container will build and start both services automatically
 
 ## Container Architecture
 
@@ -110,6 +116,7 @@ This script will run each service with its appropriate user permissions.
 - Virtual environment is readable by all services but owned by root
 - Development user (vscode) has access to service groups for debugging
 - Container uses proper UID mapping for mounted volumes
+- Environment variables from `.env` are securely loaded and not exposed in logs
 
 ## Troubleshooting
 
@@ -120,7 +127,12 @@ This script will run each service with its appropriate user permissions.
    - Verify Streamlit configuration exists in `/home/streamlit/.streamlit/`
    - Check supervisor logs for specific error messages
 
-2. Development environment:
+2. API Authentication:
+   - Verify your `.env` file exists and contains valid API keys
+   - Check the API logs for authentication errors
+   - Ensure the environment variables are properly loaded in the container
+
+3. Development environment:
    - Ensure you're using the VS Code Remote Containers extension
    - Verify the Python interpreter is correctly set to `/app/.venv/bin/python`
    - Try rebuilding the container: F1 → "Remote-Containers: Rebuild Container"
