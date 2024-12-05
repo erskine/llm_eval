@@ -50,6 +50,7 @@ COPY . .
 
 # Set up permissions
 RUN chmod +x start.sh && \
+    chmod +x llm_eval/scripts/llm_eval.sh && \
     # Make app readable by all users
     chmod -R 755 /app && \
     # Make virtual environment accessible by all users

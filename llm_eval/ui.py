@@ -61,8 +61,25 @@ with st.form("experiment_form"):
             
             # Display results in a more readable format
             for result in results["results"]:
+                # Debug print
+                print(f"Result data: {result}")
                 with st.expander(f"Response from {result['model']}"):
-                    st.text(f"Elapsed Time: {result['elapsed_time']:.2f} seconds")
+                    # Create two columns for metrics
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.metric("Elapsed Time", f"{result['elapsed_time']:.2f}s")
+                    
+                    with col2:
+                        # Create a formatted string for token counts
+                        token_counts = result.get('token_counts', {})
+                        if token_counts:
+                            st.metric("Total Tokens", token_counts.get('total', 0))
+                            st.text(f"Input: {token_counts.get('input', 0)}")
+                            st.text(f"Output: {token_counts.get('output', 0)}")
+                        else:
+                            st.text("Token counts not available")
+                    
                     st.text_area("Response", result['response'], height=100)
         else:
             st.error("Failed to run experiment. Please check if the API server is running.") 

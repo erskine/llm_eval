@@ -14,10 +14,16 @@
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 import time
 import aisuite as ai
 from dotenv import load_dotenv
+import tiktoken
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables at startup
 load_dotenv()
@@ -33,6 +39,16 @@ class ExperimentResult(BaseModel):
     model: str
     response: str
     elapsed_time: float
+    token_counts: Dict[str, int]
+
+def count_tokens(text: str, model: str) -> int:
+    """Count the number of tokens in a text string for a specific model."""
+    try:
+        encoding = tiktoken.encoding_for_model(model)
+    except KeyError:
+        # Fall back to cl100k_base encoding for unknown models
+        encoding = tiktoken.get_encoding("cl100k_base")
+    return len(encoding.encode(text))
 
 @app.post("/run_experiment/")
 async def run_experiment(experiment: Experiment):
@@ -45,21 +61,47 @@ async def run_experiment(experiment: Experiment):
     ]
     
     for model in experiment.models:
+        # Count input tokens
+        input_tokens = sum(
+            count_tokens(msg["content"], model) for msg in messages
+        )
+        
+        logger.info(f"Input tokens for {model}: {input_tokens}")
+        
         start_time = time.time()
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            temperature=0.7  # Fixed temperature for now
+            temperature=0.7
         )
         elapsed_time = time.time() - start_time
         
-        results.append(ExperimentResult(
+        # Count output tokens
+        output_text = response.choices[0].message.content
+        output_tokens = count_tokens(output_text, model)
+        
+        logger.info(f"Output tokens for {model}: {output_tokens}")
+        
+        # Create result with token counts
+        result = ExperimentResult(
             model=model,
-            response=response.choices[0].message.content,
-            elapsed_time=elapsed_time
-        ))
+            response=output_text,
+            elapsed_time=elapsed_time,
+            token_counts={
+                "input": input_tokens,
+                "output": output_tokens,
+                "total": input_tokens + output_tokens
+            }
+        )
+        
+        logger.info(f"Token counts for {model}: {result.token_counts}")
+        
+        results.append(result)
     
-    return {
+    final_response = {
         "experiment_config": experiment.dict(),
         "results": [result.dict() for result in results]
-    } 
+    }
+    
+    logger.info(f"Sending response: {final_response}")
+    return final_response 
