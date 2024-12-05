@@ -2,13 +2,13 @@
 
 # Function to show usage
 show_usage() {
-    echo "Usage: service.sh [restart|status|logs] [fastapi|streamlit|all]"
+    echo "Usage: llm_eval.sh [restart|status|logs] [fastapi|streamlit|all]"
     echo "Examples:"
-    echo "  service.sh restart all      # Restart both services"
-    echo "  service.sh restart fastapi  # Restart only FastAPI"
-    echo "  service.sh status           # Show status of all services"
-    echo "  service.sh logs fastapi     # Show FastAPI logs"
-    echo "  service.sh logs streamlit   # Show Streamlit logs"
+    echo "  llm_eval.sh restart all      # Restart both services"
+    echo "  llm_eval.sh restart fastapi  # Restart only FastAPI"
+    echo "  llm_eval.sh status           # Show status of all services"
+    echo "  llm_eval.sh logs fastapi     # Show FastAPI logs"
+    echo "  llm_eval.sh logs streamlit   # Show Streamlit logs"
 }
 
 # Check if running as root or with sudo
