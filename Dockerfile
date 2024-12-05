@@ -79,3 +79,8 @@ ENV STREAMLIT_HOME_PATH=/home/streamlit/.streamlit
 # Set supervisor as the entrypoint
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
+# Copy Streamlit config
+COPY .streamlit/config.toml /home/streamlit/.streamlit/config.toml
+RUN chown streamlit:streamlit /home/streamlit/.streamlit/config.toml && \
+    chmod 600 /home/streamlit/.streamlit/config.toml
+
