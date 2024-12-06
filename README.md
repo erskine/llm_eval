@@ -13,15 +13,33 @@ This project uses a containerized environment with two main services:
 
 ### Getting Started
 1. Clone the repository
-2. Create a `.env` file in the project root with your API credentials:
+
+2. Set up environment variables:
+   - Create a `.env` file in the project root
+   - Copy the contents from `.env.example`
+   - Replace the placeholder values with your actual API keys:
    ```
-   OPENAI_API_KEY=your_openai_key_here
-   ANTHROPIC_API_KEY=your_anthropic_key_here
-   # Add any other required API keys
+   OPENAI_API_KEY=<your openai api key>
+   ANTHROPIC_API_KEY=<your anthropic api key>
+   GOOGLE_API_KEY=<your google api key>
    ```
-3. Open in VS Code
+   Note: Keep your `.env` file private and never commit it to version control.
+
+3. Open the project in VS Code
+
 4. When prompted, click "Reopen in Container"
-5. The container will build and start both services automatically
+   - The container will build and start both services automatically
+   - The Streamlit UI will be available at http://localhost:8501
+   - The FastAPI backend will be available at http://localhost:8000
+
+## Using the Application
+
+1. Open the Streamlit UI in your browser (http://localhost:8501)
+2. Enter your desired:
+   - System prompt
+   - User prompt
+   - Select the models you want to compare
+3. Click "Run Experiment" to see the results
 
 ## Container Architecture
 
@@ -80,15 +98,6 @@ You can view logs in real-time using:
 ```bash
 tail -f /var/log/supervisor/llm_eval*.log
 ```
-
-## Using the Application
-
-1. Open the Streamlit UI in your browser (http://localhost:8501)
-2. Enter your desired:
-   - System prompt
-   - User prompt
-   - Select the models you want to compare
-3. Click "Run Experiment" to see the results
 
 ## Development
 
