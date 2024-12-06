@@ -51,8 +51,9 @@ COPY . .
 # Set up permissions
 RUN chmod +x start.sh && \
     chmod +x llm_eval/scripts/llm_eval.sh && \
-    # Make app readable by all users
+    # Make app readable and executable by all users
     chmod -R 755 /app && \
+    chown -R vscode:vscode /app/llm_eval/scripts && \
     # Make virtual environment accessible by all users
     chown -R root:root /app/.venv && \
     chmod -R 755 /app/.venv && \
@@ -68,6 +69,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Add virtual environment to PATH
 ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+ENV WATCHFILES_FORCE_POLLING=true
 
 # Create log directory with proper permissions
 RUN mkdir -p /var/log/supervisor && \

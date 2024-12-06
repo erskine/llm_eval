@@ -32,7 +32,9 @@ with st.form("experiment_form"):
     # Multi-select for models
     available_models = [
         "openai:gpt-4o-mini",
-        "anthropic:claude-3-5-haiku-20241022"
+        "openai:gpt-4o",
+        "anthropic:claude-3-5-haiku-20241022",
+        "anthropic:claude-3-5-sonnet-20241022"
     ]
     selected_models = st.multiselect(
         "Select Models",
@@ -57,29 +59,42 @@ with st.form("experiment_form"):
             st.subheader("Results")
             
             # Display experiment config
-            st.json(results["experiment_config"])
+            with st.expander("Experiment Configuration"):
+                st.json(results["experiment_config"])
             
-            # Display results in a more readable format
-            for result in results["results"]:
-                # Debug print
-                print(f"Result data: {result}")
-                with st.expander(f"Response from {result['model']}"):
-                    # Create two columns for metrics
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.metric("Elapsed Time", f"{result['elapsed_time']:.2f}s")
-                    
-                    with col2:
-                        # Create a formatted string for token counts
+            # Extract model results
+            model_results = results.get("results", [])
+            
+            if model_results:
+                # Create columns based on number of results
+                num_columns = len(model_results)
+                cols = st.columns(num_columns)
+                
+                # Display each model's results in its own column
+                for col, result in zip(cols, model_results):
+                    with col:
+                        model_name = result.get('model', 'Unknown Model')
+                        st.markdown(f"**{model_name}**")
+                        
+                        # Display metrics
+                        elapsed_time = result.get('elapsed_time', 0)
+                        st.metric("Time", f"{elapsed_time:.2f}s")
+                        
+                        # Display token counts if available
                         token_counts = result.get('token_counts', {})
                         if token_counts:
                             st.metric("Total Tokens", token_counts.get('total', 0))
-                            st.text(f"Input: {token_counts.get('input', 0)}")
-                            st.text(f"Output: {token_counts.get('output', 0)}")
-                        else:
-                            st.text("Token counts not available")
-                    
-                    st.text_area("Response", result['response'], height=100)
+                            st.write(f"Input: {token_counts.get('input', 0)}")
+                            st.write(f"Output: {token_counts.get('output', 0)}")
+                        
+                        # Display response
+                        st.text_area(
+                            "Response",
+                            result.get('response', 'No response'),
+                            height=200,
+                            disabled=True
+                        )
+            else:
+                st.warning("No model results available")
         else:
             st.error("Failed to run experiment. Please check if the API server is running.") 

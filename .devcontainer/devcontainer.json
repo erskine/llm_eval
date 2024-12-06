@@ -32,8 +32,8 @@
         }
     },
     "forwardPorts": [8000, 8501],
-    "postCreateCommand": "poetry install",
-    "postStartCommand": "tail -f /var/log/supervisor/llm_eval*.log",
-    "overrideCommand": false,
+    "postCreateCommand": "poetry install && sudo chmod +x /app/llm_eval/scripts/manage.py",
+    "postStartCommand": "sudo /app/llm_eval/scripts/manage.py dev",
+    "overrideCommand": true,
     "updateRemoteUserUID": true
 }
