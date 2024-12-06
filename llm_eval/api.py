@@ -12,14 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
+from sqlalchemy.orm import Session
 import time
 import aisuite as ai
 from dotenv import load_dotenv
 import tiktoken
 import logging
+from datetime import datetime
+from contextlib import asynccontextmanager
+
+from llm_eval.db.session import get_db
+from llm_eval.db.models import ExperimentRun, Parameter, ExperimentOutput
+from llm_eval.db.base import init_db
+from llm_eval.db import crud
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -28,12 +36,19 @@ logger = logging.getLogger(__name__)
 # Load environment variables at startup
 load_dotenv()
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 class Experiment(BaseModel):
     system_prompt: str
     user_prompt: str
     models: List[str]
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 class ExperimentResult(BaseModel):
     model: str
@@ -51,9 +66,21 @@ def count_tokens(text: str, model: str) -> int:
     return len(encoding.encode(text))
 
 @app.post("/run_experiment/")
-async def run_experiment(experiment: Experiment):
+async def run_experiment(experiment: Experiment, db: Session = Depends(get_db)):
     client = ai.Client()
     results = []
+    
+    # Use crud function to create experiment
+    db_experiment = crud.create_experiment(db, experiment)
+
+    # Save experiment parameters
+    parameters = [
+        Parameter(name="system_prompt", value=experiment.system_prompt, datatype="str"),
+        Parameter(name="user_prompt", value=experiment.user_prompt, datatype="str"),
+        Parameter(name="models", value=",".join(experiment.models), datatype="str"),
+    ]
+    db_experiment.parameters.extend(parameters)
+    db.commit()
     
     messages = [
         {"role": "system", "content": experiment.system_prompt},
@@ -82,7 +109,37 @@ async def run_experiment(experiment: Experiment):
         
         logger.info(f"Output tokens for {model}: {output_tokens}")
         
-        # Create result with token counts
+        # Save outputs to database
+        outputs = [
+            ExperimentOutput(
+                output_name=f"{model}_response",
+                output_value=output_text,
+                output_datatype="str"
+            ),
+            ExperimentOutput(
+                output_name=f"{model}_elapsed_time",
+                output_value=str(elapsed_time),
+                output_datatype="float"
+            ),
+            ExperimentOutput(
+                output_name=f"{model}_input_tokens",
+                output_value=str(input_tokens),
+                output_datatype="int"
+            ),
+            ExperimentOutput(
+                output_name=f"{model}_output_tokens",
+                output_value=str(output_tokens),
+                output_datatype="int"
+            ),
+            ExperimentOutput(
+                output_name=f"{model}_total_tokens",
+                output_value=str(input_tokens + output_tokens),
+                output_datatype="int"
+            ),
+        ]
+        db_experiment.outputs.extend(outputs)
+        
+        # Create result for API response
         result = ExperimentResult(
             model=model,
             response=output_text,
@@ -95,13 +152,35 @@ async def run_experiment(experiment: Experiment):
         )
         
         logger.info(f"Token counts for {model}: {result.token_counts}")
-        
         results.append(result)
     
+    # Update experiment status
+    db_experiment.status = "COMPLETED"
+    db.commit()
+    
     final_response = {
+        "experiment_id": db_experiment.id,
         "experiment_config": experiment.dict(),
         "results": [result.dict() for result in results]
     }
     
     logger.info(f"Sending response: {final_response}")
-    return final_response 
+    return final_response
+
+@app.get("/experiments/{experiment_id}")
+def get_experiment(experiment_id: int, db: Session = Depends(get_db)):
+    # Use crud function to get experiment
+    experiment = crud.get_experiment(db, experiment_id)
+    if experiment is None:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    # Convert to a more user-friendly format
+    return {
+        "id": experiment.id,
+        "name": experiment.name,
+        "timestamp": experiment.timestamp,
+        "description": experiment.description,
+        "status": experiment.status,
+        "parameters": {p.name: p.value for p in experiment.parameters},
+        "outputs": {o.output_name: o.output_value for o in experiment.outputs}
+    } 

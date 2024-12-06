@@ -22,7 +22,7 @@ def run_experiment(experiment_data):
     response = requests.post(url, headers=headers, json=experiment_data)
     return response.json() if response.status_code == 200 else None
 
-st.title("LLM Experiment Runner")
+st.title("Experiment Runner")
 
 # Input form
 with st.form("experiment_form"):
@@ -32,8 +32,8 @@ with st.form("experiment_form"):
     # Multi-select for models
     available_models = [
         "openai:gpt-4o-mini",
-        "openai:gpt-4o",
         "anthropic:claude-3-5-haiku-20241022",
+        "openai:gpt-4o",
         "anthropic:claude-3-5-sonnet-20241022"
     ]
     selected_models = st.multiselect(

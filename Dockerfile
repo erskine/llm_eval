@@ -54,15 +54,17 @@ RUN chmod +x start.sh && \
     # Make app readable and executable by all users
     chmod -R 755 /app && \
     chown -R vscode:vscode /app/llm_eval/scripts && \
-    # Make virtual environment accessible by all users
-    chown -R root:root /app/.venv && \
-    chmod -R 755 /app/.venv && \
+    # Make virtual environment accessible and writable by vscode user
+    chown -R vscode:vscode /app/.venv && \
+    chmod -R 775 /app/.venv && \
     # Set specific ownership for streamlit config
     chown -R streamlit:streamlit /home/streamlit/.streamlit && \
     chmod -R 750 /home/streamlit/.streamlit && \
     # Ensure vscode user can access everything in dev mode
     mkdir -p /home/vscode/.streamlit && \
-    chown -R vscode:vscode /home/vscode/.streamlit
+    chown -R vscode:vscode /home/vscode/.streamlit && \
+    chown -R vscode:vscode llm_eval/scripts && \
+    chmod +x llm_eval/scripts/manage.py
 
 # Set up supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
