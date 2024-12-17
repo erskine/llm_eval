@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from datetime import datetime
+from .models import ExperimentRun
 
 def create_experiment(db: Session, experiment: schemas.ExperimentCreate) -> models.ExperimentRun:
     db_experiment = models.ExperimentRun(
@@ -16,3 +17,6 @@ def create_experiment(db: Session, experiment: schemas.ExperimentCreate) -> mode
 
 def get_experiment(db: Session, experiment_id: int) -> models.ExperimentRun:
     return db.query(models.ExperimentRun).filter(models.ExperimentRun.id == experiment_id).first() 
+
+def get_experiments(db: Session):
+    return db.query(ExperimentRun).order_by(ExperimentRun.timestamp.desc()).all() 

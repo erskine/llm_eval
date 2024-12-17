@@ -184,3 +184,17 @@ def get_experiment(experiment_id: int, db: Session = Depends(get_db)):
         "parameters": {p.name: p.value for p in experiment.parameters},
         "outputs": {o.output_name: o.output_value for o in experiment.outputs}
     } 
+
+@app.get("/experiments/")
+def list_experiments(db: Session = Depends(get_db)):
+    experiments = crud.get_experiments(db)
+    return [
+        {
+            "id": exp.id,
+            "name": exp.name or f"Experiment #{exp.id}",
+            "timestamp": exp.timestamp,
+            "description": exp.description,
+            "status": exp.status
+        }
+        for exp in experiments
+    ] 
