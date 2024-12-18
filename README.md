@@ -1,39 +1,90 @@
-# LLM Evaluation Project
+# LLM Evaluation Platform
 
-This project provides a platform for evaluating and comparing different Large Language Models (LLMs). It consists of:
-- FastAPI backend service for running LLM experiments
-- (Coming soon) React frontend for visualization and interaction
+A comprehensive platform for evaluating and comparing different Large Language Models (LLMs). Compare responses, performance metrics, and costs across multiple LLM providers including OpenAI, Anthropic, and Google.
 
-## Backend API Setup
+## Features
 
-### Prerequisites
-- Python 3.11+
-- Poetry (for dependency management)
-- Valid API keys for supported LLM providers:
-  - OpenAI
-  - Anthropic
-  - Google
+- Run experiments with multiple LLMs simultaneously
+- Compare response quality, timing, and token usage
+- Interactive web interface for experiment configuration
+- Persistent storage of experiment results
+- Support for system and user prompts
+- Real-time result visualization
 
-### Getting Started
+## Quick Start
+
+### Option 1: Docker Compose (Recommended)
+
+Prerequisites:
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd llm-evaluation/backend
+git clonehttps://github.com/erskine/llm_eval.git
+cd llm-eval
 ```
 
 2. Set up environment variables:
-   - Copy `.env.example` to `.env` in the backend directory
-   - Add your API keys:
-   ```
-   OPENAI_API_KEY=<your openai api key>
-   ANTHROPIC_API_KEY=<your anthropic api key>
-   GOOGLE_API_KEY=<your google api key>
-   ```
+```bash
+cp backend/.env.example backend/.env
+```
 
-3. Install dependencies:
+3. Add your API keys to `backend/.env`:
+```
+OPENAI_API_KEY=<your-key>
+ANTHROPIC_API_KEY=<your-key>
+GOOGLE_API_KEY=<your-key>
+```
+
+4. Start both services:
+```bash
+docker compose up
+```
+
+The application will be available at:
+- Frontend UI: http://localhost:5173
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs
+
+### Option 2: VS Code Dev Containers
+
+1. Prerequisites:
+   - [VS Code](https://code.visualstudio.com/) or [Cursor](https://www.cursor.com/)
+   - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+   - [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+2. Open the project in VS Code or Cursor:
+```bash
+cd llm_eval
+code .
+```
+
+3. Choose your development environment:
+   - For full-stack development: Open the root folder and select "Reopen in Container"
+   - For backend-only: Open the `backend` folder and select "Reopen in Container"
+   - For frontend-only: Open the `frontend` folder and select "Reopen in Container"
+
+4. Configure environment variables as described above
+
+### Option 3: Local Development
+
+#### Backend Setup
+
+1. Navigate to backend directory:
+```bash
+cd backend
+```
+
+2. Install dependencies:
 ```bash
 poetry install
+```
+
+3. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your API keys
 ```
 
 4. Start the API server:
@@ -41,65 +92,80 @@ poetry install
 poetry run uvicorn api.v1.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-The API will be available at http://localhost:8000
+#### Frontend Setup
 
-### Development with VS Code
-
-If using VS Code, you can utilize the provided devcontainer configuration:
-
-1. Install the "Remote - Containers" extension
-2. Open the project in VS Code
-3. When prompted, click "Reopen in Container"
-4. The container will build and start the API automatically
-
-### API Documentation
-
-Once running, view the API documentation at:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-### Running Tests
-
+1. Navigate to frontend directory:
 ```bash
-poetry run pytest
+cd frontend
 ```
 
-### API Endpoints
+2. Install dependencies:
+```bash
+npm install
+```
 
-- `POST /v1/experiments/`: Run a new LLM comparison experiment
-- `GET /v1/experiments/{experiment_id}`: Get results of a specific experiment
-- `GET /v1/experiments/`: List all experiments
+3. Start the development server:
+```bash
+npm run dev
+```
 
 ## Project Structure
 
 ```
-backend/
-├── api/
-│   └── v1/
-│       ├── main.py           # FastAPI application
-│       ├── routers/
-│       │   └── experiments.py # API endpoints
-│       └── utils/
-│           └── token_counter.py
-├── persistence/
-│   ├── base.py              # Database setup
-│   ├── models.py            # SQLAlchemy models
-│   ├── schemas.py           # Pydantic schemas
-│   └── crud.py             # Database operations
-├── tests/
-│   └── test_api.py         # API tests
-├── pyproject.toml          # Poetry dependencies
-└── .env.example           # Environment variables template
+├── backend/                 # FastAPI backend service
+│   ├── api/                # API endpoints and business logic
+│   │   └── v1/
+│   │       ├── main.py
+│   │       ├── routers/
+│   │       └── utils/
+│   ├── persistence/        # Database models and operations
+│   ├── tests/             # Backend tests
+│   └── Dockerfile.dev     # Development container configuration
+├── frontend/              # React/TypeScript frontend
+│   ├── src/              # Frontend source code
+│   │   ├── components/   # React components
+│   │   ├── lib/         # Utility functions
+│   │   └── types/       # TypeScript type definitions
+│   └── Dockerfile.dev    # Development container configuration
+├── docker-compose.yml    # Multi-container Docker configuration
+└── .devcontainer/        # VS Code Dev Container configuration
 ```
 
-## Frontend (Coming Soon)
+## Development
 
-The frontend interface will provide:
-- Interactive experiment configuration
-- Results visualization
-- Historical experiment comparison
-- And more...
+### Backend (FastAPI)
+
+- Built with Python 3.11 and FastAPI
+- Uses Poetry for dependency management
+- SQLite database for persistence
+- Automatic API documentation with Swagger UI
+
+Run tests:
+```bash
+cd backend
+poetry run pytest
+```
+
+### Frontend (React)
+
+- Built with React 18, TypeScript, and Vite
+- Uses ShadcnUI components
+- Tailwind CSS for styling
+
+Available commands:
+```bash
+cd frontend
+npm run dev    # Start development server
+npm run build  # Build for production
+npm run lint   # Run ESLint
+```
+
+## API Documentation
+
+When running, access the API documentation at:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
