@@ -1,11 +1,19 @@
-import { ExperimentForm } from './components/ExperimentForm'
+import { ThemeProvider } from "@/components/theme-provider"
+import { ExperimentForm } from "@/components/ExperimentForm"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 function App() {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">LLM Experiment Runner</h1>
-      <ExperimentForm />
-    </div>
+    <ThemeProvider defaultTheme="system" storageKey="experiment-ui-theme">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-4">
+          <div className="flex justify-end mb-4">
+            <ThemeToggle />
+          </div>
+          <ExperimentForm />
+        </div>
+      </div>
+    </ThemeProvider>
   )
 }
 

@@ -96,17 +96,21 @@ export function ExperimentForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md font-primary">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Experiment Name</FormLabel>
+              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Experiment Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter experiment name..." {...field} />
+                <Input 
+                  placeholder="Enter experiment name..." 
+                  {...field} 
+                  className="font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary" 
+                />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="font-secondary text-sm dark:text-gray-300">
                 A name to identify your experiment
               </FormDescription>
               <FormMessage />
@@ -119,15 +123,15 @@ export function ExperimentForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Description</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Enter experiment description..."
-                  className="min-h-[60px]"
+                  className="min-h-[60px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="font-secondary text-sm dark:text-gray-300">
                 A brief description of what you're testing
               </FormDescription>
               <FormMessage />
@@ -140,36 +144,36 @@ export function ExperimentForm() {
           name="systemPrompt"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>System Prompt</FormLabel>
+              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">System Prompt</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Enter the system prompt..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="font-secondary text-sm dark:text-gray-300">
                 The system prompt that defines the AI's behavior
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="userPrompt"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>User Prompt</FormLabel>
+              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">User Prompt</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Enter the user prompt..."
-                  className="min-h-[100px]"
+                  className="min-h-[100px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
+              <FormDescription className="font-secondary text-sm dark:text-gray-300">
                 The prompt that will be sent to the AI models
               </FormDescription>
               <FormMessage />
@@ -182,11 +186,11 @@ export function ExperimentForm() {
           name="models"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Models</FormLabel>
+              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Models</FormLabel>
               <FormControl>
                 <select
                   multiple
-                  className="min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="min-h-[100px] w-full rounded-md border border-secondary-grey bg-secondary-lightGrey dark:bg-gray-700 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary dark:text-gray-100"
                   value={field.value}
                   onChange={(e) => {
                     const values = Array.from(e.target.selectedOptions, option => option.value)
@@ -194,13 +198,13 @@ export function ExperimentForm() {
                   }}
                 >
                   {AVAILABLE_MODELS.map((model) => (
-                    <option key={model} value={model}>
+                    <option key={model} value={model} className="dark:text-gray-100 bg-secondary-lightGrey dark:bg-gray-700">
                       {model}
                     </option>
                   ))}
                 </select>
               </FormControl>
-              <FormDescription>
+              <FormDescription className="font-secondary text-sm dark:text-gray-300">
                 Select one or more AI models to test (use Ctrl/Cmd + click to select multiple)
               </FormDescription>
               <FormMessage />
@@ -208,37 +212,41 @@ export function ExperimentForm() {
           )}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="w-full bg-primary hover:bg-primary-dark text-white transition-colors font-primary font-medium"
+        >
           {isSubmitting ? "Running Experiment..." : "Run Experiment"}
         </Button>
 
         {status === "running" && (
-          <Card className="p-4">
-            <p className="text-center">Running experiment, please wait...</p>
+          <Card className="p-4 border-secondary-grey bg-secondary-lightGrey">
+            <p className="text-center text-primary-dark font-secondary italic">Running experiment, please wait...</p>
           </Card>
         )}
 
         {status === "error" && error && (
-          <Card className="p-4 border-destructive">
-            <p className="text-destructive">Error: {error}</p>
+          <Card className="p-4 border-red-500 bg-red-50">
+            <p className="text-red-600">Error: {error}</p>
           </Card>
         )}
 
         {status === "complete" && result && (
-          <Card className="p-4">
-            <h3 className="font-semibold mb-4">Results</h3>
+          <Card className="p-4 border-secondary-green">
+            <h3 className="font-primary font-bold text-xl mb-4 text-primary-dark">Results</h3>
             <ScrollArea className="h-[400px]">
               {result.results.map((modelResult, index) => (
-                <div key={index} className="mb-6">
-                  <h4 className="font-medium mb-2">{modelResult.model}</h4>
+                <div key={index} className="mb-6 p-4 bg-secondary-lightGrey rounded-lg">
+                  <h4 className="font-primary font-medium text-lg mb-2 text-primary">{modelResult.model}</h4>
                   <div className="space-y-2">
-                    <p><span className="font-medium">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
-                    <p><span className="font-medium">Tokens:</span> {modelResult.token_counts.total} 
+                    <p className="font-primary"><span className="font-medium text-primary-dark">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
+                    <p className="font-primary"><span className="font-medium text-primary-dark">Tokens:</span> {modelResult.token_counts.total} 
                       (Input: {modelResult.token_counts.input}, 
                       Output: {modelResult.token_counts.output})</p>
                     <div className="mt-2">
-                      <p className="font-medium">Response:</p>
-                      <p className="whitespace-pre-wrap bg-muted p-2 rounded-md">
+                      <p className="font-primary font-medium text-primary-dark">Response:</p>
+                      <p className="font-secondary whitespace-pre-wrap bg-white p-4 rounded-md border border-secondary-grey">
                         {modelResult.response}
                       </p>
                     </div>

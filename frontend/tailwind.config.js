@@ -21,12 +21,13 @@ module.exports = {
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				DEFAULT: '#507DCA',
+  				dark: '#34577D',
   			},
   			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
+  				green: '#76A678',
+  				grey: '#A8B6BF',
+  				lightGrey: '#D3DCE6',
   			},
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',
@@ -51,6 +52,10 @@ module.exports = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		}
+  	},
+  	fontFamily: {
+  		primary: ['Roboto', 'sans-serif'],
+  		secondary: ['Open Sans', 'sans-serif'],
   	}
   },
   plugins: [require("tailwindcss-animate")],
