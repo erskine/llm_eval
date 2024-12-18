@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ExperimentRequest, ExperimentResponse } from "@/types/api"
+import { Input } from "@/components/ui/input"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -79,6 +80,44 @@ export function ExperimentForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Experiment Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter experiment name..." {...field} />
+              </FormControl>
+              <FormDescription>
+                A name to identify your experiment
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter experiment description..."
+                  className="min-h-[60px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                A brief description of what you're testing
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="systemPrompt"
