@@ -1,0 +1,16 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install dependencies first (better layer caching)
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the frontend code
+COPY . .
+
+# Expose the development server port
+EXPOSE 5173
+
+# Command to run the development server
+CMD ["npm", "run", "dev"] 

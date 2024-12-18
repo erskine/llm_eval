@@ -1,0 +1,34 @@
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+        git \
+        curl \
+        build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV WATCHFILES_FORCE_POLLING=true
+
+# Install Poetry
+ENV POETRY_HOME=/opt/poetry
+RUN pip install poetry && \
+    poetry config virtualenvs.create false  # Install dependencies globally in container
+
+# Set working directory
+WORKDIR /app
+
+# Copy only dependency files first
+COPY pyproject.toml poetry.lock ./
+
+# Install dependencies globally
+RUN poetry install --no-root
+
+# Expose the development server port
+EXPOSE 8000
+
+# Use poetry run with the global environment
+CMD ["uvicorn", "api.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
