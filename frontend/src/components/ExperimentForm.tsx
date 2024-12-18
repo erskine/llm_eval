@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ExperimentRequest, ExperimentResponse } from "@/types/api"
 import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -36,7 +39,13 @@ const AVAILABLE_MODELS = [
     "anthropic:claude-3-5-sonnet-20241022"
 ] as const
 
+type ExperimentStatus = "idle" | "running" | "complete" | "error"
+
 export function ExperimentForm() {
+  const [status, setStatus] = useState<ExperimentStatus>("idle")
+  const [result, setResult] = useState<ExperimentResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,6 +57,10 @@ export function ExperimentForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setStatus("running")
+      setError(null)
+      setResult(null)
+
       const experimentRequest: ExperimentRequest = {
         name: values.name,
         description: values.description,
@@ -70,12 +83,16 @@ export function ExperimentForm() {
       }
 
       const data: ExperimentResponse = await response.json()
-      console.log('Experiment submitted successfully:', data)
-      form.reset()
+      setResult(data)
+      setStatus("complete")
     } catch (error) {
       console.error('Error submitting experiment:', error)
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred')
+      setStatus("error")
     }
   }
+
+  const isSubmitting = status === "running"
 
   return (
     <Form {...form}>
@@ -191,7 +208,46 @@ export function ExperimentForm() {
           )}
         />
 
-        <Button type="submit">Run Experiment</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Running Experiment..." : "Run Experiment"}
+        </Button>
+
+        {status === "running" && (
+          <Card className="p-4">
+            <p className="text-center">Running experiment, please wait...</p>
+          </Card>
+        )}
+
+        {status === "error" && error && (
+          <Card className="p-4 border-destructive">
+            <p className="text-destructive">Error: {error}</p>
+          </Card>
+        )}
+
+        {status === "complete" && result && (
+          <Card className="p-4">
+            <h3 className="font-semibold mb-4">Results</h3>
+            <ScrollArea className="h-[400px]">
+              {result.results.map((modelResult, index) => (
+                <div key={index} className="mb-6">
+                  <h4 className="font-medium mb-2">{modelResult.model}</h4>
+                  <div className="space-y-2">
+                    <p><span className="font-medium">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
+                    <p><span className="font-medium">Tokens:</span> {modelResult.token_counts.total} 
+                      (Input: {modelResult.token_counts.input}, 
+                      Output: {modelResult.token_counts.output})</p>
+                    <div className="mt-2">
+                      <p className="font-medium">Response:</p>
+                      <p className="whitespace-pre-wrap bg-muted p-2 rounded-md">
+                        {modelResult.response}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </ScrollArea>
+          </Card>
+        )}
       </form>
     </Form>
   )
