@@ -1,72 +1,25 @@
-# Copyright 2024 Erskine Williams
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
-from typing import List, Dict, Optional
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List, Dict, Optional
+from pydantic import BaseModel
 import time
 import aisuite as ai
-from dotenv import load_dotenv
-import tiktoken
 import logging
-from datetime import datetime
-from contextlib import asynccontextmanager
 
-from llm_eval.db.session import get_db
-from llm_eval.db.models import ExperimentRun, Parameter, ExperimentOutput
-from llm_eval.db.base import init_db
-from llm_eval.db import crud
+from persistence import schemas
+from persistence.session import get_db
+from persistence.models import ExperimentRun, Parameter, ExperimentOutput
+from persistence import crud
+from ..utils.token_counter import count_tokens
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables at startup
-load_dotenv()
+router = APIRouter()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
-
-app = FastAPI(lifespan=lifespan)
-
-class Experiment(BaseModel):
-    system_prompt: str
-    user_prompt: str
-    models: List[str]
-    name: Optional[str] = None
-    description: Optional[str] = None
-
-class ExperimentResult(BaseModel):
-    model: str
-    response: str
-    elapsed_time: float
-    token_counts: Dict[str, int]
-
-def count_tokens(text: str, model: str) -> int:
-    """Count the number of tokens in a text string for a specific model."""
-    try:
-        encoding = tiktoken.encoding_for_model(model)
-    except KeyError:
-        # Fall back to cl100k_base encoding for unknown models
-        encoding = tiktoken.get_encoding("cl100k_base")
-    return len(encoding.encode(text))
-
-@app.post("/run_experiment/")
-async def run_experiment(experiment: Experiment, db: Session = Depends(get_db)):
+@router.post("/experiments/")
+async def run_experiment(experiment: schemas.ExperimentCreate, db: Session = Depends(get_db)):
     client = ai.Client()
     results = []
     
@@ -139,19 +92,17 @@ async def run_experiment(experiment: Experiment, db: Session = Depends(get_db)):
         ]
         db_experiment.outputs.extend(outputs)
         
-        # Create result for API response
-        result = ExperimentResult(
-            model=model,
-            response=output_text,
-            elapsed_time=elapsed_time,
-            token_counts={
+        # Create result dictionary directly from database outputs
+        result = {
+            "model": model,
+            "response": output_text,
+            "elapsed_time": elapsed_time,
+            "token_counts": {
                 "input": input_tokens,
                 "output": output_tokens,
                 "total": input_tokens + output_tokens
             }
-        )
-        
-        logger.info(f"Token counts for {model}: {result.token_counts}")
+        }
         results.append(result)
     
     # Update experiment status
@@ -161,18 +112,19 @@ async def run_experiment(experiment: Experiment, db: Session = Depends(get_db)):
     final_response = {
         "experiment_id": db_experiment.id,
         "experiment_config": experiment.dict(),
-        "results": [result.dict() for result in results]
+        "results": results  # Now using the list of dictionaries directly
     }
     
-    logger.info(f"Sending response: {final_response}")
+    logger.info(f"Sending results: {final_response}")
     return final_response
 
-@app.get("/experiments/{experiment_id}")
+@router.get("/experiments/{experiment_id}")
 def get_experiment(experiment_id: int, db: Session = Depends(get_db)):
     # Use crud function to get experiment
     experiment = crud.get_experiment(db, experiment_id)
     if experiment is None:
         raise HTTPException(status_code=404, detail="Experiment not found")
+
     
     # Convert to a more user-friendly format
     return {
@@ -185,7 +137,7 @@ def get_experiment(experiment_id: int, db: Session = Depends(get_db)):
         "outputs": {o.output_name: o.output_value for o in experiment.outputs}
     } 
 
-@app.get("/experiments/")
+@router.get("/experiments/")
 def list_experiments(db: Session = Depends(get_db)):
     experiments = crud.get_experiments(db)
     return [
