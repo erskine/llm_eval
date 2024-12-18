@@ -1,6 +1,6 @@
 {
-	"name": "Python FastAPI Development",
-	"dockerFile": "Dockerfile",
+	"name": "Backend Development",
+	"dockerFile": "../Dockerfile.dev",
 	"forwardPorts": [8000],
 	"customizations": {
 		"vscode": {
@@ -13,6 +13,5 @@
 		}
 	},
 	"postCreateCommand": "poetry install",
-	"postStartCommand": "poetry run uvicorn api.v1.main:app --host 0.0.0.0 --port 8000 --reload",
 	"remoteUser": "vscode"
 } 
