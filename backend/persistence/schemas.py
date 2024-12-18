@@ -2,15 +2,20 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
+class ExperimentCreate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    system_prompt: str
+    user_prompt: str
+    models: List[str]
+
+    class Config:
+        from_attributes = True
+
 class ParameterCreate(BaseModel):
     name: str
     value: str
     datatype: str
-
-class ExperimentCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-    parameters: List[ParameterCreate] = []
 
 class ParameterResponse(BaseModel):
     id: int
