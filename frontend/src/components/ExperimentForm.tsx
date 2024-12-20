@@ -96,157 +96,168 @@ export function ExperimentForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md font-primary">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Experiment Name</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Enter experiment name..." 
-                  {...field} 
-                  className="font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary" 
-                />
-              </FormControl>
-              <FormDescription className="font-secondary text-sm dark:text-gray-300">
-                A name to identify your experiment
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full max-w-[1200px] mx-auto bg-card p-8 rounded-lg shadow-md">
+        {/* First row - two columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Experiment Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter experiment name..." 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormDescription>
+                  A name to identify your experiment
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter experiment description..."
-                  className="min-h-[60px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="font-secondary text-sm dark:text-gray-300">
-                A brief description of what you're testing
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter experiment description..."
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  A brief description of what you're testing
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="systemPrompt"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">System Prompt</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter the system prompt..."
-                  className="min-h-[100px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="font-secondary text-sm dark:text-gray-300">
-                The system prompt that defines the AI's behavior
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Second row - two columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="systemPrompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>System Prompt</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter the system prompt..."
+                    className="min-h-[150px] resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  The system prompt that defines the AI's behavior
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="userPrompt"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">User Prompt</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter the user prompt..."
-                  className="min-h-[100px] font-primary bg-secondary-lightGrey dark:bg-gray-700 dark:text-gray-100 border-secondary-grey focus-visible:ring-primary"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription className="font-secondary text-sm dark:text-gray-300">
-                The prompt that will be sent to the AI models
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="userPrompt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>User Prompt</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter the user prompt..."
+                    className="min-h-[150px] resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  The prompt that will be sent to the AI models
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="models"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-primary font-bold text-lg text-primary-dark dark:text-gray-100">Models</FormLabel>
-              <FormControl>
-                <select
-                  multiple
-                  className="min-h-[100px] w-full rounded-md border border-secondary-grey bg-secondary-lightGrey dark:bg-gray-700 px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary dark:text-gray-100"
-                  value={field.value}
-                  onChange={(e) => {
-                    const values = Array.from(e.target.selectedOptions, option => option.value)
-                    field.onChange(values)
-                  }}
-                >
-                  {AVAILABLE_MODELS.map((model) => (
-                    <option key={model} value={model} className="dark:text-gray-100 bg-secondary-lightGrey dark:bg-gray-700">
-                      {model}
-                    </option>
-                  ))}
-                </select>
-              </FormControl>
-              <FormDescription className="font-secondary text-sm dark:text-gray-300">
-                Select one or more AI models to test (use Ctrl/Cmd + click to select multiple)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Third row - models and submit button */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="models"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Models</FormLabel>
+                <FormControl>
+                  <select
+                    multiple
+                    className="min-h-[100px] w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    value={field.value}
+                    onChange={(e) => {
+                      const values = Array.from(e.target.selectedOptions, option => option.value)
+                      field.onChange(values)
+                    }}
+                  >
+                    {AVAILABLE_MODELS.map((model) => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormDescription>
+                  Select one or more AI models to test (use Ctrl/Cmd + click to select multiple)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button 
-          type="submit" 
-          disabled={isSubmitting}
-          className="w-full bg-primary hover:bg-primary-dark text-white transition-colors font-primary font-medium"
-        >
-          {isSubmitting ? "Running Experiment..." : "Run Experiment"}
-        </Button>
+          <div className="flex justify-end items-end">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-[200px]"
+            >
+              {isSubmitting ? "Running..." : "Run Experiment"}
+            </Button>
+          </div>
+        </div>
 
+        {/* Status and results section */}
         {status === "running" && (
-          <Card className="p-4 border-secondary-grey bg-secondary-lightGrey">
-            <p className="text-center text-primary-dark font-secondary italic">Running experiment, please wait...</p>
+          <Card className="p-4">
+            <p className="text-center text-muted-foreground italic">Running experiment, please wait...</p>
           </Card>
         )}
 
         {status === "error" && error && (
-          <Card className="p-4 border-red-500 bg-red-50">
-            <p className="text-red-600">Error: {error}</p>
+          <Card className="p-4 border-destructive">
+            <p className="text-destructive">Error: {error}</p>
           </Card>
         )}
 
         {status === "complete" && result && (
-          <Card className="p-4 border-secondary-green">
-            <h3 className="font-primary font-bold text-xl mb-4 text-primary-dark">Results</h3>
-            <ScrollArea className="h-[400px]">
+          <Card className="p-4">
+            <h3 className="font-semibold text-xl mb-4">Results</h3>
+            <ScrollArea className="h-[400px] w-full rounded-md border">
               {result.results.map((modelResult, index) => (
-                <div key={index} className="mb-6 p-4 bg-secondary-lightGrey rounded-lg">
-                  <h4 className="font-primary font-medium text-lg mb-2 text-primary">{modelResult.model}</h4>
+                <div key={index} className="mb-6 p-4 border-b last:border-b-0">
+                  <h4 className="font-medium text-lg mb-2">{modelResult.model}</h4>
                   <div className="space-y-2">
-                    <p className="font-primary"><span className="font-medium text-primary-dark">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
-                    <p className="font-primary"><span className="font-medium text-primary-dark">Tokens:</span> {modelResult.token_counts.total} 
+                    <p><span className="font-medium">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
+                    <p><span className="font-medium">Tokens:</span> {modelResult.token_counts.total} 
                       (Input: {modelResult.token_counts.input}, 
                       Output: {modelResult.token_counts.output})</p>
                     <div className="mt-2">
-                      <p className="font-primary font-medium text-primary-dark">Response:</p>
-                      <p className="font-secondary whitespace-pre-wrap bg-white p-4 rounded-md border border-secondary-grey">
+                      <p className="font-medium">Response:</p>
+                      <p className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md">
                         {modelResult.response}
                       </p>
                     </div>
