@@ -4,7 +4,11 @@ WORKDIR /app
 
 # Install dependencies first (better layer caching)
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+
+# Clean install with legacy peer deps and clear npm cache
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps && \
+    npm cache clean --force
 
 # Copy the rest of the frontend code
 COPY . .
