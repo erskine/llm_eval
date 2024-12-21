@@ -23,4 +23,16 @@ export interface ExperimentResponse {
   experiment_id: number;
   experiment_config: ExperimentRequest;
   results: ExperimentResult[];
+}
+
+export interface Experiment {
+  id: number;
+  name: string;
+  timestamp: string;
+  status: string;
+  description: string;
+}
+
+export interface ExperimentDetails extends Experiment {
+  results: any;
 } 

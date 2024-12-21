@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 from persistence.session import get_db
 from persistence.base import init_db
 from .routers import experiments
+from fastapi.middleware.cors import CORSMiddleware
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -35,5 +36,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Your React app's address
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Include routers
-app.include_router(experiments.router, prefix="/v1")
+app.include_router(experiments.router, prefix="/api/v1")

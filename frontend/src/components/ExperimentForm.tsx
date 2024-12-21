@@ -69,7 +69,14 @@ export function ExperimentForm() {
         models: values.models,
       }
 
-      const response = await fetch('/api/v1/experiments/', {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      console.log('Submitting request:', {
+        url: `${baseUrl}/api/v1/experiments/`,
+        method: 'POST',
+        payload: experimentRequest
+      });
+
+      const response = await fetch(`${baseUrl}/api/v1/experiments/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,12 +84,16 @@ export function ExperimentForm() {
         body: JSON.stringify(experimentRequest),
       })
       
+      // Log the raw response before trying to parse it
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+      
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Failed to submit experiment')
+        throw new Error(`Failed to submit experiment: ${response.status} ${response.statusText}\n${responseText}`);
       }
 
-      const data: ExperimentResponse = await response.json()
+      // Only try to parse JSON if we have content
+      const data: ExperimentResponse = responseText ? JSON.parse(responseText) : null;
       setResult(data)
       setStatus("complete")
     } catch (error) {

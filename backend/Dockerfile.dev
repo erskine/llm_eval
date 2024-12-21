@@ -1,15 +1,15 @@
 FROM python:3.11-slim
 
-# Install system dependencies
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
+# Install system dependencies without GPG key verification
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         git \
         curl \
         build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry (do this before creating the non-root user)
+# Install Poetry
 ENV POETRY_HOME=/opt/poetry
 ENV POETRY_VERSION=1.8.2
 ENV PATH="/opt/poetry/bin:$PATH"
@@ -41,7 +41,7 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
     # [Optional] Add sudo support
-    && apt-get update \
+    && apt-get update --allow-insecure-repositories \
     && apt-get install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME

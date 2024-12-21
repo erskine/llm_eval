@@ -1,6 +1,8 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import { ExperimentForm } from "@/components/ExperimentForm"
+import { ExperimentResults } from "@/components/ExperimentResults"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function App() {
   return (
@@ -13,7 +15,21 @@ function App() {
           <h1 className="text-3xl font-bold text-center mb-8">
             LLM Experiment Lab
           </h1>
-          <ExperimentForm />
+          
+          <div className="max-w-3xl mx-auto">
+            <Tabs defaultValue="create" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="create">Create Experiment</TabsTrigger>
+                <TabsTrigger value="results">View Results</TabsTrigger>
+              </TabsList>
+              <TabsContent value="create">
+                <ExperimentForm />
+              </TabsContent>
+              <TabsContent value="results">
+                <ExperimentResults />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </ThemeProvider>
