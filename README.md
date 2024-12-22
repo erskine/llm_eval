@@ -1,171 +1,107 @@
-# LLM Evaluation Platform
+# LLM Evaluation Framework
 
-A comprehensive platform for evaluating and comparing different Large Language Models (LLMs). Compare responses, performance metrics, and costs across multiple LLM providers including OpenAI, Anthropic, and Google.
+Hello! I'm Claude, and I've been helping Erskine (when he lets me) build this rather interesting project. Between his occasional bursts of inspiration and my constant gentle nudging towards best practices, we've created a framework for evaluating Large Language Models. Let me tell you all about it!
 
-## Features
+## Overview
 
-- Run experiments with multiple LLMs simultaneously
-- Compare response quality, timing, and token usage
-- Interactive web interface for experiment configuration
-- Persistent storage of experiment results
-- Support for system and user prompts
-- Real-time result visualization
+This project was born from the need to systematically evaluate how different LLMs perform at knowledge graph extraction tasks under varying conditions. It allows you to experiment with different combinations of:
+- System prompts (the instructions that shape an LLM's behavior)
+- User prompts (the actual queries or tasks)
+- Different LLM models
+- Various evaluation metrics
 
-## Quick Start
+Think of it as a playground for prompt engineering, but with scientific rigor and actual metrics. Yes, we're making prompt engineering slightly less of an art and more of a science. Erskine insisted on that part.
 
-### Option 1: Docker Compose (Recommended)
+## Architecture
 
-Prerequisites:
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+We've kept things modern yet simple (I had to talk Erskine out of several "innovative" architectural decisions):
 
-1. Clone the repository:
-```bash
-git clonehttps://github.com/erskine/llm_eval.git
-cd llm-eval
-```
-
-2. Set up environment variables:
-```bash
-cp backend/.env.example backend/.env
-```
-
-3. Add your API keys to `backend/.env`:
-```
-OPENAI_API_KEY=<your-key>
-ANTHROPIC_API_KEY=<your-key>
-GOOGLE_API_KEY=<your-key>
-```
-
-4. Start both services:
-```bash
-docker compose up
-```
-
-The application will be available at:
-- Frontend UI: http://localhost:5173
-- Backend API: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-
-### Option 2: VS Code Dev Containers
-
-1. Prerequisites:
-   - [VS Code](https://code.visualstudio.com/) or [Cursor](https://www.cursor.com/)
-   - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-   - [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-
-2. Open the project in VS Code or Cursor:
-```bash
-cd llm_eval
-code .
-```
-
-3. Choose your development environment:
-   - For full-stack development: Open the root folder and select "Reopen in Container"
-   - For backend-only: Open the `backend` folder and select "Reopen in Container"
-   - For frontend-only: Open the `frontend` folder and select "Reopen in Container"
-
-4. Configure environment variables as described above
-
-### Option 3: Local Development
-
-#### Backend Setup
-
-1. Navigate to backend directory:
-```bash
-cd backend
-```
-
-2. Install dependencies:
-```bash
-poetry install
-```
-
-3. Configure environment:
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-4. Start the API server:
-```bash
-poetry run uvicorn api.v1.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-#### Frontend Setup
-
-1. Navigate to frontend directory:
-```bash
-cd frontend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm run dev
-```
+- **Backend**: FastAPI (because we like our Python fast and typed)
+- **Frontend**: React + ShadcN UI + Vite (because life's too short for boring UIs)
+- **Database**: SQLite (because sometimes the simple solution is the right one)
 
 ## Project Structure
 
+Here's how we've organized things (I promise it makes sense once you get used to it):
+
 ```
-├── backend/                 # FastAPI backend service
-│   ├── api/                # API endpoints and business logic
-│   │   └── v1/
-│   │       ├── main.py
-│   │       ├── routers/
-│   │       └── utils/
-│   ├── persistence/        # Database models and operations
-│   ├── tests/             # Backend tests
-│   └── Dockerfile.dev     # Development container configuration
-├── frontend/              # React/TypeScript frontend
-│   ├── src/              # Frontend source code
-│   │   ├── components/   # React components
-│   │   ├── lib/         # Utility functions
-│   │   └── types/       # TypeScript type definitions
-│   └── Dockerfile.dev    # Development container configuration
-├── docker-compose.yml    # Multi-container Docker configuration
-└── .devcontainer/        # VS Code Dev Container configuration
+llm_eval/
+├── backend/             # FastAPI application
+│   ├── app/             # Core application code
+│   ├── tests/           # Test suite
+│   └── pyproject.toml   # Poetry dependencies
+├── frontend/            # React application
+│   ├── src/             # Source code
+│   ├── public/          # Static assets
+│   └── package.json     # npm dependencies
+├── docker-compose.yml   # Container orchestration
+└── README.md            # You are here!
 ```
+
+## Prerequisites
+
+Before you dive in, you'll need:
+
+- [Docker](https://www.docker.com/products/docker-desktop/) - Because containerization is not just a buzzword
+- [VSCode](https://code.visualstudio.com/) or [Cursor](https://cursor.sh/) - Your choice of IDE (though Cursor has some neat AI features)
+- [Git](https://git-scm.com/) - For version control, obviously
+- A sense of humor - For reading this README
+
+## Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/llm_eval.git
+   cd llm_eval
+   ```
+
+2. Start the development environment:
+   ```bash
+   docker compose up --build
+   ```
+
+3. Access the application:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
 
 ## Development
 
-### Backend (FastAPI)
+You have two (and eventually three) ways to run this project (because we believe in choices):
 
-- Built with Python 3.11 and FastAPI
-- Uses Poetry for dependency management
-- SQLite database for persistence
-- Automatic API documentation with Swagger UI
+1. **Docker Compose** (recommended):
+   ```bash
+   docker compose up --build
+   ```
 
-Run tests:
-```bash
-cd backend
-poetry run pytest
-```
+2. **Local Development**:
+   ```bash
+   # Backend
+   cd backend
+   poetry install
+   poetry run uvicorn app.main:app --reload
 
-### Frontend (React)
+   # Frontend (in another terminal)
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-- Built with React 18, TypeScript, and Vite
-- Uses ShadcnUI components
-- Tailwind CSS for styling
+3. **Dev Containers in VSCode** (Coming eventually):
+   - Open in VSCode
+   - Install the Dev Containers extension
+   - Click "Reopen in Container" when prompted
 
-Available commands:
-```bash
-cd frontend
-npm run dev    # Start development server
-npm run build  # Build for production
-npm run lint   # Run ESLint
-```
+## Contributing
 
-## API Documentation
-
-When running, access the API documentation at:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+Feel free to contribute! Just remember:
+1. Keep it simple
+2. Write tests
+3. Don't make me argue with Erskine about architectural decisions
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Apache 2.0 - See LICENSE file for details.
+
+---
+*Built with ❤️ by Erskine and his occasionally helpful AI assistant (that's me!)*
