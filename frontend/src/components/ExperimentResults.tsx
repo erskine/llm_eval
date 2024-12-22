@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -10,42 +10,56 @@ import {
 } from "@/components/ui/table";
 import { useExperiments } from "@/hooks/useExperiments";
 import { useExperimentDetails } from "@/hooks/useExperimentDetails";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Experiment, ExperimentResult } from "@/types/api";
+import { Experiment } from "@/types/api";
+import { Button } from "@/components/ui/button";
+import { useExperimentContext } from "@/context/ExperimentContext";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-export function ExperimentResults() {
+interface ExperimentResultsProps {
+  onRunAgain?: (experiment: Experiment) => void;
+}
+
+export function ExperimentResults({ onRunAgain }: ExperimentResultsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: experiments = [], isLoading, error } = useExperiments();
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment | null>(null);
   const { data: experimentDetails, isLoading: isLoadingDetails } = useExperimentDetails(
     selectedExperiment?.id ?? null
   );
-
-  useEffect(() => {
-    console.log('Selected experiment:', selectedExperiment);
-    console.log('Experiment details:', experimentDetails);
-    if (experimentDetails) {
-      console.log('Experiment details structure:', {
-        hasResults: 'results' in experimentDetails,
-        resultsType: experimentDetails.results ? typeof experimentDetails.results : 'undefined',
-        hasConfig: experimentDetails.results?.experiment_config ? 'yes' : 'no',
-        hasModelResults: Array.isArray(experimentDetails.results?.results),
-        modelResults: experimentDetails.results?.results
-      });
-    }
-  }, [selectedExperiment, experimentDetails]);
+  const { setSelectedExperiment: setContextExperiment } = useExperimentContext();
+  const [isSystemPromptOpen, setIsSystemPromptOpen] = useState(true);
+  const [isUserPromptOpen, setIsUserPromptOpen] = useState(true);
 
   const handleExperimentClick = (experiment: Experiment) => {
     console.log('Clicked experiment:', experiment);
     setSelectedExperiment(experiment);
+  };
+
+  const handleRunAgain = () => {
+    if (experimentDetails) {
+      setContextExperiment({
+        ...selectedExperiment!,
+        parameters: experimentDetails.parameters
+      });
+      setSelectedExperiment(null);
+      if (onRunAgain) {
+        onRunAgain(selectedExperiment!);
+      }
+    }
   };
 
   const filteredExperiments = experiments.filter((experiment) =>
@@ -54,15 +68,6 @@ export function ExperimentResults() {
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
   );
-
-  // Helper function to parse JSON safely
-  const parseJSON = (str: string) => {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return str;
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -150,18 +155,55 @@ export function ExperimentResults() {
                   <div>
                     <h3 className="text-sm font-medium mb-2">Configuration</h3>
                     <div className="space-y-2">
-                      <div className="text-sm">
-                        <div className="font-medium">System Prompt:</div>
-                        <div className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap">
-                          {experimentDetails.parameters.system_prompt}
+                      <Collapsible
+                        open={isSystemPromptOpen}
+                        onOpenChange={setIsSystemPromptOpen}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium">System Prompt</h4>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="w-9 p-0">
+                              <ChevronDown
+                                className={`h-4 w-4 transition-transform duration-200 ${
+                                  isSystemPromptOpen ? "" : "-rotate-90"
+                                }`}
+                              />
+                              <span className="sr-only">Toggle system prompt</span>
+                            </Button>
+                          </CollapsibleTrigger>
                         </div>
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">User Prompt:</div>
-                        <div className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap">
-                          {experimentDetails.parameters.user_prompt}
+                        <CollapsibleContent className="space-y-2">
+                          <div className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap">
+                            {experimentDetails.parameters.system_prompt}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      <Collapsible
+                        open={isUserPromptOpen}
+                        onOpenChange={setIsUserPromptOpen}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium">User Prompt</h4>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="w-9 p-0">
+                              <ChevronDown
+                                className={`h-4 w-4 transition-transform duration-200 ${
+                                  isUserPromptOpen ? "" : "-rotate-90"
+                                }`}
+                              />
+                              <span className="sr-only">Toggle user prompt</span>
+                            </Button>
+                          </CollapsibleTrigger>
                         </div>
-                      </div>
+                        <CollapsibleContent className="space-y-2">
+                          <div className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap">
+                            {experimentDetails.parameters.user_prompt}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                   </div>
                 )}
@@ -248,6 +290,11 @@ export function ExperimentResults() {
               </div>
             ) : null}
           </ScrollArea>
+          <DialogFooter>
+            <Button onClick={handleRunAgain}>
+              Run Again
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

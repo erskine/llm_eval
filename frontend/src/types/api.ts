@@ -7,18 +7,30 @@ export interface ExperimentRequest {
 }
 
 export interface Experiment {
-  id: number;
-  name: string;
+  id: string;
+  name?: string;
+  description?: string;
   timestamp: string;
   status: string;
-  description: string;
+  parameters?: ExperimentParameters;
 }
 
-export interface ExperimentDetails extends Experiment {
-  parameters: {
-    system_prompt: string;
-    user_prompt: string;
-    models: string;
-  };
-  outputs: Record<string, string>;
+export interface ExperimentParameters {
+  system_prompt: string;
+  user_prompt: string;
+  models: string[];
+}
+
+export interface ExperimentResponse {
+  id: string;
+  results: Array<{
+    model: string;
+    elapsed_time: number;
+    token_counts: {
+      total: number;
+      input: number;
+      output: number;
+    };
+    response: string;
+  }>;
 } 

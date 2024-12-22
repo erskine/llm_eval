@@ -14,9 +14,10 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ExperimentRequest, ExperimentResponse } from "@/types/api"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useExperimentContext } from "@/context/ExperimentContext"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -45,6 +46,7 @@ export function ExperimentForm() {
   const [status, setStatus] = useState<ExperimentStatus>("idle")
   const [result, setResult] = useState<ExperimentResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const { selectedExperiment, setSelectedExperiment } = useExperimentContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,6 +56,19 @@ export function ExperimentForm() {
       models: [],
     },
   })
+
+  useEffect(() => {
+    if (selectedExperiment?.parameters) {
+      form.reset({
+        name: selectedExperiment.name,
+        description: selectedExperiment.description,
+        systemPrompt: selectedExperiment.parameters.system_prompt,
+        userPrompt: selectedExperiment.parameters.user_prompt,
+        models: selectedExperiment.parameters.models || [],
+      });
+      setSelectedExperiment(null);
+    }
+  }, [selectedExperiment, form, setSelectedExperiment]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
