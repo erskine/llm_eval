@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { type ExperimentDetails } from "@/types/api";
 
-async function fetchExperimentDetails(id: number): Promise<ExperimentDetails> {
+async function fetchExperimentDetails(id: string | number): Promise<ExperimentDetails> {
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
     const url = `${baseUrl}/api/v1/experiments/${id}`;
@@ -26,7 +26,7 @@ async function fetchExperimentDetails(id: number): Promise<ExperimentDetails> {
   }
 }
 
-export function useExperimentDetails(id: number | null) {
+export function useExperimentDetails(id: string | number | null) {
   return useQuery({
     queryKey: ['experiment', id],
     queryFn: () => id ? fetchExperimentDetails(id) : null,

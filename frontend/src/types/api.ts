@@ -33,4 +33,16 @@ export interface ExperimentResponse {
     };
     response: string;
   }>;
+}
+
+export interface ExperimentDetails extends Experiment {
+  parameters: {
+    system_prompt: string;
+    user_prompt: string;
+    models: string[];
+    [key: string]: any;
+  };
+  outputs: {
+    [key: string]: string;
+  };
 } 

@@ -126,7 +126,17 @@ async def run_experiment(experiment: schemas.ExperimentCreate, db: Session = Dep
         return final_response
     except Exception as e:
         logger.exception("Error processing experiment")
-        # Return a proper error response instead of raising
+        # Update experiment status and save error details
+        if 'db_experiment' in locals():
+            db_experiment.status = "ERROR"
+            error_output = ExperimentOutput(
+                output_name="error_details",
+                output_value=str(e),
+                output_datatype="str"
+            )
+            db_experiment.outputs.append(error_output)
+            db.commit()
+        # Return a proper error response
         return JSONResponse(
             status_code=500,
             content={"detail": str(e)}

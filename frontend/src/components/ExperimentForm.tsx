@@ -18,6 +18,9 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useExperimentContext } from "@/context/ExperimentContext"
+import { JsonGraph } from "@/components/JsonGraph"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ExamplePrompts } from "@/components/ExamplePrompts"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -41,6 +44,15 @@ const AVAILABLE_MODELS = [
 ] as const
 
 type ExperimentStatus = "idle" | "running" | "complete" | "error"
+
+function isValidJson(str: string): boolean {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function ExperimentForm() {
   const [status, setStatus] = useState<ExperimentStatus>("idle")
@@ -99,9 +111,7 @@ export function ExperimentForm() {
         body: JSON.stringify(experimentRequest),
       })
       
-      // Log the raw response before trying to parse it
       const responseText = await response.text();
-      console.log('Raw response:', responseText);
       
       if (!response.ok) {
         throw new Error(`Failed to submit experiment: ${response.status} ${response.statusText}\n${responseText}`);
@@ -166,6 +176,7 @@ export function ExperimentForm() {
             )}
           />
         </div>
+
 
         {/* Second row - two columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -272,7 +283,7 @@ export function ExperimentForm() {
         {status === "complete" && result && (
           <Card className="p-4">
             <h3 className="font-semibold text-xl mb-4">Results</h3>
-            <ScrollArea className="h-[400px] w-full rounded-md border">
+            <ScrollArea className="h-[600px] w-full rounded-md border">
               {result.results.map((modelResult, index) => (
                 <div key={index} className="mb-6 p-4 border-b last:border-b-0">
                   <h4 className="font-medium text-lg mb-2">{modelResult.model}</h4>
@@ -283,9 +294,34 @@ export function ExperimentForm() {
                       Output: {modelResult.token_counts.output})</p>
                     <div className="mt-2">
                       <p className="font-medium">Response:</p>
-                      <p className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md">
-                        {modelResult.response}
-                      </p>
+                      {isValidJson(modelResult.response) ? (
+                        <Card className="p-4">
+                          <Tabs defaultValue="raw" className="w-full">
+                            <TabsList className="w-full justify-start">
+                              <TabsTrigger value="raw">JSON Response</TabsTrigger>
+                              <TabsTrigger value="graph">Graph Visualization</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="raw">
+                              <pre className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md overflow-auto max-h-[600px]">
+                                {JSON.stringify(JSON.parse(modelResult.response), null, 2)}
+                              </pre>
+                            </TabsContent>
+                            <TabsContent value="graph">
+                              <div className="border rounded-md p-4">
+                                <JsonGraph 
+                                  data={JSON.parse(modelResult.response)} 
+                                  height={600}
+                                  width={1000}
+                                />
+                              </div>
+                            </TabsContent>
+                          </Tabs>
+                        </Card>
+                      ) : (
+                        <p className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md">
+                          {modelResult.response}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
