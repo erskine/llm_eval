@@ -82,4 +82,5 @@ backend/.env.*.local
 
 # Project specific
 backend/*.db
-backend/*.sqlite 
+backend/*.sqlite
+backend/data/

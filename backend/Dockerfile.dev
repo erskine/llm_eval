@@ -24,6 +24,8 @@ ENV WATCHFILES_FORCE_POLLING=true
 # Set working directory
 WORKDIR /app
 
+RUN mkdir -p /app/data
+
 # Copy only dependency files first
 COPY pyproject.toml poetry.lock ./
 
@@ -48,6 +50,9 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # [Optional] Set the default user
 USER $USERNAME
+
+# Create data directory and set permissions
+RUN sudo chown -R $USERNAME:$USERNAME /app/data
 
 # Use poetry run with the global environment
 CMD ["uvicorn", "api.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
