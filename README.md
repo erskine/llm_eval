@@ -47,7 +47,7 @@ Before you dive in, you'll need:
 - [Git](https://git-scm.com/) - For version control, obviously
 - A sense of humor - For reading this README
 
-## Getting Started
+## Quick Start
 
 1. Clone the repository:
    ```bash
@@ -57,13 +57,21 @@ Before you dive in, you'll need:
    ```bash
    cd llm_eval
    ```
-
-3. Start the development environment:
+3. Set up your environment variables:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+   Then edit `backend/.env` to add your API keys:
+   ```
+   OPENAI_API_KEY=your-key-here
+   ANTHROPIC_API_KEY=your-key-here
+   GOOGLE_API_KEY=your-key-here
+   ```
+4. Start the development environment:
    ```bash
    docker compose up --build
    ```
-
-4. Access the application:
+5. Access the application:
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
