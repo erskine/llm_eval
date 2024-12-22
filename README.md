@@ -51,16 +51,19 @@ Before you dive in, you'll need:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/llm_eval.git
+   git clone https://github.com/erskine/llm_eval.git
+   ```
+2. Change directories into the newly cloned project root
+   ```bash
    cd llm_eval
    ```
 
-2. Start the development environment:
+3. Start the development environment:
    ```bash
    docker compose up --build
    ```
 
-3. Access the application:
+4. Access the application:
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
