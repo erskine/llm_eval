@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["id", "domain", "complexity", "metrics", "tags", "created", "version"],
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "domain": {
+            "type": "string"
+        },
+        "complexity": {
+            "type": "string",
+            "enum": ["micro", "small", "medium", "large", "complex"]
+        },
+        "metrics": {
+            "type": "object",
+            "required": ["expected_entity_count", "expected_relationship_count", "entity_types", "key_relationships"],
+            "properties": {
+                "expected_entity_count": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "expected_relationship_count": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "entity_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "key_relationships": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "tags": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "created": {
+            "type": "string",
+            "format": "date"
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+        }
+    }
+} 

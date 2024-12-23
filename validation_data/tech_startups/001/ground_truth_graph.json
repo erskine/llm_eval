@@ -1,0 +1,58 @@
+{
+    "metadata": {
+      "timestamp": "2024-11-15T00:00:00Z",
+      "source": "Bay Area Startup Weekly",
+      "date": "2024-11-15"
+    },
+    "nodes": [
+      {
+        "id": "datamesh",
+        "type": "Company",
+        "properties": {
+          "name": "DataMesh",
+          "location": "San Francisco",
+          "industry": "AI database"
+        }
+      },
+      {
+        "id": "rodriguez",
+        "type": "Person",
+        "properties": {
+          "name": "Dr. Lisa Rodriguez",
+          "title": "Founder"
+        }
+      },
+      {
+        "id": "seed_round",
+        "type": "Event",
+        "properties": {
+          "type": "Seed Funding",
+          "amount": 3500000,
+          "date": "2024-11-15",
+          "currency": "USD"
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "source": "rodriguez",
+        "target": "datamesh",
+        "type": "FOUNDED",
+        "properties": {}
+      },
+      {
+        "source": "seed_round",
+        "target": "datamesh",
+        "type": "FUNDED",
+        "properties": {}
+      },
+      {
+        "source": "seed_round",
+        "target": "datamesh",
+        "type": "INVESTED_IN",
+        "properties": {
+          "investor": "First Round Capital"
+        }
+      }
+    ]
+  }

@@ -1,0 +1,9 @@
+Bay Area Startup Weekly - November 15, 2024
+
+DataMesh Secures Seed Round for Database Innovation
+
+DataMesh, a San Francisco-based startup developing an AI-powered distributed database system, has secured $3.5 million in seed funding. The round was led by First Round Capital, with participation from angel investor and MongoDB veteran Mark Thompson.
+
+The company was founded in June 2024 by Dr. Lisa Rodriguez, previously lead architect at Snowflake, and Alex Kim, who led distributed systems at Databricks. Their technology uses machine learning to optimize database performance across hybrid cloud environments.
+
+"DataMesh's approach to solving distributed database challenges is truly innovative," said Josh Miller, partner at First Round Capital, who will join the company's board. The funds will be used to grow the engineering team and accelerate product development.

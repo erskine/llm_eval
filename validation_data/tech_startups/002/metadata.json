@@ -1,0 +1,19 @@
+{
+    "id": "tech_startup_001",
+    "domain": "tech_startups",
+    "complexity": "micro",
+    "metrics": {
+      "expected_entity_count": 9,
+      "expected_relationship_count": 9,
+      "entity_types": ["Company", "Person", "Event"],
+      "key_relationships": ["FOUNDED", "WORKED_AT", "LED_INVESTMENT", "PARTICIPATED_IN", "FUNDED", "JOINED_BOARD"],
+      "key_entities": {
+        "companies": ["DataMesh", "First Round Capital", "Snowflake", "Databricks"],
+        "people": ["Dr. Lisa Rodriguez", "Alex Kim", "Mark Thompson", "Josh Miller"],
+        "events": ["Seed Funding"]
+      }
+    },
+    "tags": ["funding", "founding-team", "venture-capital", "enterprise-tech", "databases"],
+    "created": "2024-12-22",
+    "version": "1.0"
+  }

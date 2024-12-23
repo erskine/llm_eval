@@ -1,0 +1,14 @@
+{
+    "id": "tech_startup_001",
+    "domain": "tech_startups",
+    "complexity": "micro",
+    "metrics": {
+      "expected_entity_count": 3,
+      "expected_relationship_count": 3,
+      "entity_types": ["Company", "Person", "Event"],
+      "key_relationships": ["FOUNDED", "FUNDED", "INVESTED_IN"]
+    },
+    "tags": ["funding", "founding-team"],
+    "created": "2024-12-22",
+    "version": "1.0"
+  }

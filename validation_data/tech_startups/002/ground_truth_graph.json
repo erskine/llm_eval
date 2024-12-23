@@ -1,0 +1,158 @@
+{
+    "metadata": {
+      "timestamp": "2024-11-15T00:00:00Z",
+      "source": "Bay Area Startup Weekly",
+      "date": "2024-11-15"
+    },
+    "nodes": [
+      {
+        "id": "datamesh",
+        "type": "Company",
+        "properties": {
+          "name": "DataMesh",
+          "location": "San Francisco",
+          "founding_date": "2024-06",
+          "product": "AI-powered distributed database system"
+        }
+      },
+      {
+        "id": "frc",
+        "type": "Company",
+        "properties": {
+          "name": "First Round Capital",
+          "type": "Venture Capital"
+        }
+      },
+      {
+        "id": "snowflake",
+        "type": "Company",
+        "properties": {
+          "name": "Snowflake"
+        }
+      },
+      {
+        "id": "databricks",
+        "type": "Company",
+        "properties": {
+          "name": "Databricks"
+        }
+      },
+      {
+        "id": "rodriguez",
+        "type": "Person",
+        "properties": {
+          "name": "Dr. Lisa Rodriguez",
+          "title": "Co-founder",
+          "previous_role": "lead architect"
+        }
+      },
+      {
+        "id": "kim",
+        "type": "Person",
+        "properties": {
+          "name": "Alex Kim",
+          "title": "Co-founder",
+          "previous_role": "distributed systems lead"
+        }
+      },
+      {
+        "id": "thompson",
+        "type": "Person",
+        "properties": {
+          "name": "Mark Thompson",
+          "background": "MongoDB veteran",
+          "type": "angel investor"
+        }
+      },
+      {
+        "id": "miller",
+        "type": "Person",
+        "properties": {
+          "name": "Josh Miller",
+          "title": "Partner"
+        }
+      },
+      {
+        "id": "seed_round",
+        "type": "Event",
+        "properties": {
+          "type": "Seed Funding",
+          "amount": 3500000,
+          "date": "2024-11-15",
+          "currency": "USD"
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "source": "rodriguez",
+        "target": "datamesh",
+        "type": "FOUNDED",
+        "properties": {
+          "date": "2024-06"
+        }
+      },
+      {
+        "source": "kim",
+        "target": "datamesh",
+        "type": "FOUNDED",
+        "properties": {
+          "date": "2024-06"
+        }
+      },
+      {
+        "source": "rodriguez",
+        "target": "snowflake",
+        "type": "WORKED_AT",
+        "properties": {
+          "role": "lead architect",
+          "past": true
+        }
+      },
+      {
+        "source": "kim",
+        "target": "databricks",
+        "type": "WORKED_AT",
+        "properties": {
+          "role": "distributed systems lead",
+          "past": true
+        }
+      },
+      {
+        "source": "frc",
+        "target": "seed_round",
+        "type": "LED_INVESTMENT",
+        "properties": {}
+      },
+      {
+        "source": "thompson",
+        "target": "seed_round",
+        "type": "PARTICIPATED_IN",
+        "properties": {
+          "type": "angel"
+        }
+      },
+      {
+        "source": "seed_round",
+        "target": "datamesh",
+        "type": "FUNDED",
+        "properties": {}
+      },
+      {
+        "source": "miller",
+        "target": "frc",
+        "type": "WORKS_AT",
+        "properties": {
+          "role": "Partner"
+        }
+      },
+      {
+        "source": "miller",
+        "target": "datamesh",
+        "type": "JOINED_BOARD",
+        "properties": {
+          "date": "2024-11-15"
+        }
+      }
+    ]
+  }
