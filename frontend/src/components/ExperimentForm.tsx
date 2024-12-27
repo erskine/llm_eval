@@ -15,12 +15,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { ExperimentRequest, ExperimentResponse } from "@/types/api"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { useExperimentContext } from "@/context/ExperimentContext"
-import { JsonGraph } from "@/components/JsonGraph"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ExamplePrompts } from "@/components/ExamplePrompts"
+import { ExperimentDetailsDialog } from "@/components/ExperimentDetailsDialog"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -45,20 +41,13 @@ const AVAILABLE_MODELS = [
 
 type ExperimentStatus = "idle" | "running" | "complete" | "error"
 
-function isValidJson(str: string): boolean {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 export function ExperimentForm() {
   const [status, setStatus] = useState<ExperimentStatus>("idle")
   const [result, setResult] = useState<ExperimentResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const { selectedExperiment, setSelectedExperiment } = useExperimentContext();
+  const [statusUpdates, setStatusUpdates] = useState<string[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,8 +74,8 @@ export function ExperimentForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setStatus("running")
-      setError(null)
-      setResult(null)
+      setStatusUpdates([]);
+      setIsDialogOpen(true);
 
       const experimentRequest: ExperimentRequest = {
         name: values.name,
@@ -95,6 +84,8 @@ export function ExperimentForm() {
         user_prompt: values.userPrompt,
         models: values.models,
       }
+
+      setStatusUpdates(prev => [...prev, "Submitting experiment..."]);
 
       const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
       console.log('Submitting request:', {
@@ -121,10 +112,25 @@ export function ExperimentForm() {
       const data: ExperimentResponse = responseText ? JSON.parse(responseText) : null;
       setResult(data)
       setStatus("complete")
+      setStatusUpdates(prev => [...prev, "Experiment completed successfully!"]);
     } catch (error) {
       console.error('Error submitting experiment:', error)
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred')
       setStatus("error")
+      setStatusUpdates(prev => [...prev, `Error: ${error instanceof Error ? error.message : 'An unexpected error occurred'}`]);
+      // Create minimal result object for error state
+      setResult({
+        id: 'error',
+        results: [{
+          model: 'system',
+          elapsed_time: 0,
+          token_counts: {
+            total: 0,
+            input: 0,
+            output: 0
+          },
+          response: error instanceof Error ? error.message : 'An unexpected error occurred'
+        }]
+      });
     }
   }
 
@@ -267,68 +273,41 @@ export function ExperimentForm() {
           </div>
         </div>
 
-        {/* Status and results section */}
-        {status === "running" && (
-          <Card className="p-4">
-            <p className="text-center text-muted-foreground italic">Running experiment, please wait...</p>
-          </Card>
-        )}
-
-        {status === "error" && error && (
-          <Card className="p-4 border-destructive">
-            <p className="text-destructive">Error: {error}</p>
-          </Card>
-        )}
-
-        {status === "complete" && result && (
-          <Card className="p-4">
-            <h3 className="font-semibold text-xl mb-4">Results</h3>
-            <ScrollArea className="h-[600px] w-full rounded-md border">
-              {result.results.map((modelResult, index) => (
-                <div key={index} className="mb-6 p-4 border-b last:border-b-0">
-                  <h4 className="font-medium text-lg mb-2">{modelResult.model}</h4>
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Time:</span> {modelResult.elapsed_time.toFixed(2)}s</p>
-                    <p><span className="font-medium">Tokens:</span> {modelResult.token_counts.total} 
-                      (Input: {modelResult.token_counts.input}, 
-                      Output: {modelResult.token_counts.output})</p>
-                    <div className="mt-2">
-                      <p className="font-medium">Response:</p>
-                      {isValidJson(modelResult.response) ? (
-                        <Card className="p-4">
-                          <Tabs defaultValue="raw" className="w-full">
-                            <TabsList className="w-full justify-start">
-                              <TabsTrigger value="raw">JSON Response</TabsTrigger>
-                              <TabsTrigger value="graph">Graph Visualization</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="raw">
-                              <pre className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md overflow-auto max-h-[600px]">
-                                {JSON.stringify(JSON.parse(modelResult.response), null, 2)}
-                              </pre>
-                            </TabsContent>
-                            <TabsContent value="graph">
-                              <div className="border rounded-md p-4">
-                                <JsonGraph 
-                                  data={JSON.parse(modelResult.response)} 
-                                  height={600}
-                                  width={1000}
-                                />
-                              </div>
-                            </TabsContent>
-                          </Tabs>
-                        </Card>
-                      ) : (
-                        <p className="whitespace-pre-wrap bg-muted/50 p-4 rounded-md">
-                          {modelResult.response}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </ScrollArea>
-          </Card>
-        )}
+        <ExperimentDetailsDialog
+          experiment={result ? { 
+            id: result.id,
+            name: form.getValues("name") || "Untitled Experiment",
+            description: form.getValues("description") || "",
+            timestamp: new Date().toISOString(),
+            status: result.status || (status === "error" ? "ERROR" : status === "complete" ? "COMPLETED" : "RUNNING")
+          } : null}
+          experimentDetails={result ? {
+            id: result.id,
+            status: result.status || (status === "error" ? "ERROR" : status === "complete" ? "COMPLETED" : "RUNNING"),
+            timestamp: new Date().toISOString(),
+            parameters: {
+              system_prompt: form.getValues("systemPrompt"),
+              user_prompt: form.getValues("userPrompt"),
+              models: form.getValues("models")
+            },
+            outputs: {
+              ...(status === "error" ? { error_details: result.error_details } : {}),
+              ...result.results.reduce((acc, result) => ({
+                ...acc,
+                [`${result.model}_elapsed_time`]: result.elapsed_time,
+                [`${result.model}_total_tokens`]: result.token_counts.total,
+                [`${result.model}_input_tokens`]: result.token_counts.input,
+                [`${result.model}_output_tokens`]: result.token_counts.output,
+                [`${result.model}_response`]: result.response,
+              }), {})
+            }
+          } : null}
+          isLoading={status === "running"}
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          status={status}
+          statusUpdates={statusUpdates}
+        />
       </form>
     </Form>
   )

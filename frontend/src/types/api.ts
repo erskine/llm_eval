@@ -33,6 +33,8 @@ export interface ExperimentResponse {
     };
     response: string;
   }>;
+  status?: string;
+  error_details?: string;
 }
 
 export interface ExperimentDetails extends Experiment {
