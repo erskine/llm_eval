@@ -55,4 +55,4 @@ USER $USERNAME
 RUN sudo chown -R $USERNAME:$USERNAME /app/data
 
 # Use poetry run with the global environment
-CMD ["uvicorn", "api.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

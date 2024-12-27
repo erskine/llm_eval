@@ -19,8 +19,7 @@ from dotenv import load_dotenv
 
 from persistence.session import get_db
 from persistence.base import init_db
-from .routers import experiments
-from ..routes import validation
+from api.v1.endpoints import experiments
 from fastapi.middleware.cors import CORSMiddleware
 
 # Set up logging
@@ -54,4 +53,3 @@ app.add_middleware(
 
 # Include routers
 app.include_router(experiments.router, prefix="/api/v1")
-app.include_router(validation.router, prefix="/api/v1")
