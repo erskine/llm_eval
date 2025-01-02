@@ -14,6 +14,8 @@ import { Loader2 } from "lucide-react";
 import { Experiment } from "@/types/api";
 import { useExperimentContext } from "@/context/ExperimentContext";
 import { ExperimentDetailsDialog } from "@/components/ExperimentDetailsDialog";
+import { useTabContext } from "@/context/TabContext";
+import { useNavigate } from "react-router-dom";
 
 export function ExperimentResults({ onRunAgain }: { onRunAgain?: (experiment: Experiment) => void }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +25,8 @@ export function ExperimentResults({ onRunAgain }: { onRunAgain?: (experiment: Ex
     selectedExperiment?.id ?? null
   );
   const { setSelectedExperiment: setContextExperiment } = useExperimentContext();
+  const { setActiveTab } = useTabContext();
+  const navigate = useNavigate();
 
   const handleExperimentClick = (experiment: Experiment) => {
     setSelectedExperiment(experiment);
@@ -34,6 +38,8 @@ export function ExperimentResults({ onRunAgain }: { onRunAgain?: (experiment: Ex
       parameters: experimentDetails!.parameters
     });
     setSelectedExperiment(null);
+    setActiveTab("create");
+    navigate("/");
     if (onRunAgain) {
       onRunAgain(experiment);
     }

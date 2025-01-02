@@ -43,6 +43,9 @@ interface ExperimentDetailsDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onRunAgain?: (experiment: Experiment) => void;
+  onBrowseResults?: () => void;
+  onNewExperiment?: () => void;
+  showAllActions?: boolean;
   status?: string;
   statusUpdates?: string[];
 }
@@ -54,6 +57,9 @@ export function ExperimentDetailsDialog({
   isOpen,
   onOpenChange,
   onRunAgain,
+  onBrowseResults,
+  onNewExperiment,
+  showAllActions,
   status,
   statusUpdates = [],
 }: ExperimentDetailsDialogProps) {
@@ -288,11 +294,33 @@ export function ExperimentDetailsDialog({
           ) : null}
         </ScrollArea>
         <DialogFooter>
-          {onRunAgain && (
-            <Button onClick={handleRunAgain}>
-              Run Again
-            </Button>
-          )}
+          <div className="flex gap-2 justify-end">
+            {showAllActions ? (
+              <>
+                <Button variant="outline" onClick={() => {
+                  onOpenChange(false);
+                  onNewExperiment?.();
+                }}>
+                  New Experiment
+                </Button>
+                <Button variant="outline" onClick={() => {
+                  onOpenChange(false);
+                  onBrowseResults?.();
+                }}>
+                  Browse Results
+                </Button>
+                {onRunAgain && (
+                  <Button onClick={handleRunAgain}>
+                    Run Again
+                  </Button>
+                )}
+              </>
+            ) : onRunAgain ? (
+              <Button onClick={handleRunAgain}>
+                Run Again
+              </Button>
+            ) : null}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

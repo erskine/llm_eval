@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ExperimentRequest, ExperimentResponse } from "@/types/api"
+import { ExperimentRequest, ExperimentResponse, Experiment } from "@/types/api"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { useExperimentContext } from "@/context/ExperimentContext"
 import { ExperimentDetailsDialog } from "@/components/ExperimentDetailsDialog"
+import { useNavigate } from "react-router-dom"
+import { useTabContext } from "@/context/TabContext"
 
 const formSchema = z.object({
   name: z.string().optional(),
@@ -33,10 +35,11 @@ const formSchema = z.object({
 })
 
 const AVAILABLE_MODELS = [
-    "openai:gpt-4o-mini",
     "anthropic:claude-3-5-haiku-20241022",
+    "anthropic:claude-3-5-sonnet-20241022",
+//    "google:gemini-1.5-flash:generateContent",
     "openai:gpt-4o",
-    "anthropic:claude-3-5-sonnet-20241022"
+    "openai:gpt-4o-mini"
 ] as const
 
 type ExperimentStatus = "idle" | "running" | "complete" | "error"
@@ -46,8 +49,10 @@ export function ExperimentForm() {
   const [status, setStatus] = useState<ExperimentStatus>("idle")
   const [result, setResult] = useState<ExperimentResponse | null>(null)
   const { selectedExperiment, setSelectedExperiment } = useExperimentContext();
+  const { setActiveTab } = useTabContext();
   const [statusUpdates, setStatusUpdates] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -135,6 +140,35 @@ export function ExperimentForm() {
   }
 
   const isSubmitting = status === "running"
+
+  const handleBrowseResults = () => {
+    setActiveTab("results");
+    navigate("/results");
+  };
+
+  const handleNewExperiment = () => {
+    form.reset({
+      name: "",
+      description: "",
+      systemPrompt: "",
+      userPrompt: "",
+      models: [] as string[],
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleRunAgain = (experiment: Experiment) => {
+    if (experiment.parameters) {
+      form.reset({
+        name: experiment.name || "",
+        description: experiment.description || "",
+        systemPrompt: experiment.parameters.system_prompt,
+        userPrompt: experiment.parameters.user_prompt,
+        models: experiment.parameters.models,
+      });
+    }
+    setIsDialogOpen(false);
+  };
 
   return (
     <Form {...form}>
@@ -305,6 +339,10 @@ export function ExperimentForm() {
           isLoading={status === "running"}
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
+          onRunAgain={handleRunAgain}
+          onBrowseResults={handleBrowseResults}
+          onNewExperiment={handleNewExperiment}
+          showAllActions={true}
           status={status}
           statusUpdates={statusUpdates}
         />
