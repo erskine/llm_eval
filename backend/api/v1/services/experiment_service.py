@@ -20,7 +20,7 @@ class ExperimentService:
             results = []
             
             # Log the experiment data before creating DB entry
-            logger.info(f"Creating experiment with data: {experiment.dict()}")
+            logger.info(f"Creating experiment with data: {experiment.model_dump()}")
             
             # Use crud function to create experiment
             db_experiment = crud.create_experiment(db, experiment)
@@ -163,7 +163,7 @@ class ExperimentService:
             
             return {
                 "id": db_experiment.id,
-                "experiment_config": experiment.dict(),
+                "experiment_config": experiment.model_dump(),
                 "results": results,
                 "status": db_experiment.status,
                 "error_details": None
@@ -182,7 +182,7 @@ class ExperimentService:
                 
                 return {
                     "id": db_experiment.id,
-                    "experiment_config": experiment.dict(),
+                    "experiment_config": experiment.model_dump(),
                     "results": [],
                     "status": "ERROR",
                     "error_details": str(e)

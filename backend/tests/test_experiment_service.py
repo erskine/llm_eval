@@ -22,7 +22,7 @@ def sample_experiment():
         description="Test Description",
         system_prompt="You are a helpful assistant",
         user_prompt="Tell me a joke",
-        models=["gpt-4", "claude-v3"]
+        models=["openai:gpt-4o-mini", "anthropic:claude-3-5-sonnet-20241022"]
     )
 
 @pytest.mark.asyncio
@@ -42,7 +42,7 @@ async def test_run_experiment_success(mock_crud, mock_client, service, mock_db, 
         id=1,
         name="Test Experiment",
         timestamp=datetime.now(),
-        status="PENDING",
+        status="RUNNING",
         parameters=[],
         outputs=[]
     )
@@ -71,7 +71,7 @@ async def test_run_experiment_with_error(mock_crud, mock_client, service, mock_d
         id=1,
         name="Test Experiment",
         timestamp=datetime.now(),
-        status="PENDING",
+        status="RUNNING",
         parameters=[],
         outputs=[]
     )

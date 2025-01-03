@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
@@ -9,8 +9,7 @@ class ExperimentCreate(BaseModel):
     user_prompt: str
     models: List[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ParameterCreate(BaseModel):
     name: str
@@ -23,8 +22,7 @@ class ParameterResponse(BaseModel):
     value: str
     datatype: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class OutputResponse(BaseModel):
     id: int
@@ -32,8 +30,7 @@ class OutputResponse(BaseModel):
     output_value: str
     output_datatype: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ExperimentResponse(BaseModel):
     id: int
@@ -44,5 +41,4 @@ class ExperimentResponse(BaseModel):
     parameters: List[ParameterResponse]
     outputs: List[OutputResponse]
 
-    class Config:
-        orm_mode = True 
+    model_config = ConfigDict(from_attributes=True) 
