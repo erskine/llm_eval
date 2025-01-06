@@ -7,56 +7,31 @@ const metadataSchema = z.object({
   date: z.string()
 })
 
-// Define the node properties schemas
-const companyProperties = z.object({
-  name: z.string(),
-  industry: z.string().optional(),
-  founding_date: z.string().optional(),
-  location: z.string().optional(),
-  employee_count: z.number().optional(),
-  patent_count: z.number().optional(),
-  product: z.string().optional(),
-  division: z.string().optional(),
-  type: z.string().optional()
-})
+// Define property formats
+const propertyValue = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+const propertyItem = z.object({
+  key: z.string(),
+  value: propertyValue
+});
 
-const personProperties = z.object({
-  name: z.string(),
-  title: z.string().optional()
-})
+// Properties must be an array of key-value pairs
+const propertiesSchema = z.array(propertyItem);
 
-const eventProperties = z.object({
+// Define the node schema
+const nodeSchema = z.object({
+  id: z.string(),
   type: z.string(),
-  amount: z.number().optional(),
-  date: z.string().optional(),
-  currency: z.string().optional()
+  name: z.string(),
+  properties: propertiesSchema
 })
-
-// Define the node schema with discriminated union
-const nodeSchema = z.discriminatedUnion("type", [
-  z.object({
-    id: z.string(),
-    type: z.literal("Company"),
-    properties: companyProperties
-  }),
-  z.object({
-    id: z.string(),
-    type: z.literal("Person"),
-    properties: personProperties
-  }),
-  z.object({
-    id: z.string(),
-    type: z.literal("Event"),
-    properties: eventProperties
-  })
-])
 
 // Define the relationship schema
 const relationshipSchema = z.object({
-  source: z.string(),
-  target: z.string(),
+  source_id: z.string(),
+  target_id: z.string(),
   type: z.string(),
-  properties: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional()
+  name: z.string(),
+  properties: propertiesSchema.optional()
 })
 
 // Define the complete graph schema
@@ -67,4 +42,10 @@ export const graphSchema = z.object({
 })
 
 // Type inference
-export type GraphData = z.infer<typeof graphSchema> 
+export type GraphData = z.infer<typeof graphSchema>
+
+// Helper function to get a property value by key
+export function getPropertyValue(props: z.infer<typeof propertiesSchema>, key: string): z.infer<typeof propertyValue> | undefined {
+  const prop = props.find(p => p.key === key);
+  return prop?.value;
+} 

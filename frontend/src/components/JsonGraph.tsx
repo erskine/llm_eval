@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { validateGraphData } from '@/utils/graphValidation';
-import { GraphData } from '@/schemas/graph';
+import { GraphData, getPropertyValue } from '@/schemas/graph';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
@@ -9,6 +9,26 @@ interface JsonGraphProps {
   data: unknown;
   width?: number;
   height?: number;
+}
+
+interface Property {
+  key: string;
+  value: string | number | boolean | null;
+}
+
+interface Node {
+  id: string;
+  type: string;
+  name: string;
+  properties: Property[];
+}
+
+interface Relationship {
+  source_id: string;
+  target_id: string;
+  type: string;
+  name: string;
+  properties?: Property[];
 }
 
 interface VisGraphData {
@@ -43,35 +63,17 @@ export function JsonGraph({ data, width = 800, height = 600 }: JsonGraphProps) {
     const visGraph: VisGraphData = { nodes: [], links: [] };
 
     // Transform nodes
-    visGraph.nodes = validData.nodes.map(node => {
-      let label = node.id;
-      
-      switch (node.type) {
-        case "Company":
-          label = node.properties.name;
-          break;
-        case "Person":
-          label = node.properties.name;
-          break;
-        case "Event": {
-          const eventProps = node.properties;
-          label = `${eventProps.type}${eventProps.date ? ` (${eventProps.date})` : ''}`;
-          break;
-        }
-      }
-
-      return {
-        id: node.id,
-        label,
-        group: node.type.toLowerCase()
-      };
-    });
+    visGraph.nodes = validData.nodes.map(node => ({
+      id: node.id,
+      label: node.name,
+      group: node.type.toLowerCase()
+    }));
 
     // Transform relationships
     visGraph.links = validData.relationships.map(rel => ({
-      source: rel.source,
-      target: rel.target,
-      label: rel.type
+      source: rel.source_id,
+      target: rel.target_id,
+      label: rel.name
     }));
 
     return visGraph;
