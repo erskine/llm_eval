@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "$defs": {
+      "property_array": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["key", "value"],
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "oneOf": [
+                {"type": "string"},
+                {"type": "integer"}, 
+                {"type": "number"},
+                {"type": "boolean"},
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {"type": "null"}
+              ]
+            }
+          }
+        }
+      }
+    },
+    "required": ["metadata", "nodes", "relationships"],
+    "properties": {
+      "metadata": {
+        "type": "object",
+        "required": ["timestamp", "source", "date"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        }
+      },
+      "nodes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "type", "name", "properties"],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "properties": {
+              "$ref": "#/$defs/property_array"
+            }
+          }
+        }
+      },
+      "relationships": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["source_id", "target_id", "type", "name", "properties"],
+          "properties": {
+            "source_id": {
+              "type": "string"
+            },
+            "target_id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "properties": {
+              "$ref": "#/$defs/property_array"
+            }
+          }
+        }
+      }
+    }
+  }
