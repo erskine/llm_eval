@@ -31,17 +31,23 @@ interface Relationship {
   properties?: Property[];
 }
 
+interface VisGraphNode {
+  id: string;
+  label: string;
+  group?: string;
+  properties: Property[];
+}
+
+interface VisGraphLink {
+  source: string;
+  target: string;
+  label: string;
+  properties?: Property[];
+}
+
 interface VisGraphData {
-  nodes: Array<{
-    id: string;
-    label: string;
-    group?: string;
-  }>;
-  links: Array<{
-    source: string;
-    target: string;
-    label: string;
-  }>;
+  nodes: VisGraphNode[];
+  links: VisGraphLink[];
 }
 
 export function JsonGraph({ data, width = 800, height = 600 }: JsonGraphProps) {
@@ -52,6 +58,12 @@ export function JsonGraph({ data, width = 800, height = 600 }: JsonGraphProps) {
     import('react-force-graph-2d').then(module => {
       setForceGraph2D(module.default);
     });
+  }, []);
+
+  const formatProperties = useCallback((properties: Property[]) => {
+    return properties
+      .map(({ key, value }) => `${key}: ${value}`)
+      .join('\n');
   }, []);
 
   const graphData = useMemo(() => {
@@ -66,18 +78,31 @@ export function JsonGraph({ data, width = 800, height = 600 }: JsonGraphProps) {
     visGraph.nodes = validData.nodes.map(node => ({
       id: node.id,
       label: node.name,
-      group: node.type.toLowerCase()
+      group: node.type.toLowerCase(),
+      properties: node.properties
     }));
 
     // Transform relationships
     visGraph.links = validData.relationships.map(rel => ({
       source: rel.source_id,
       target: rel.target_id,
-      label: rel.name
+      label: rel.name,
+      properties: rel.properties
     }));
 
     return visGraph;
   }, [validationResult]);
+
+  const nodeTitle = useCallback((node: VisGraphNode) => {
+    if (!node.properties?.length) {
+      return `${node.label} (${node.group})`;
+    }
+    return `${node.label} (${node.group})\n\n${formatProperties(node.properties)}`;
+  }, [formatProperties]);
+
+  const linkTitle = useCallback((link: VisGraphLink) => {
+    return link.label;
+  }, []);
 
   const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D) => {
     const label = node.label;
@@ -139,8 +164,12 @@ export function JsonGraph({ data, width = 800, height = 600 }: JsonGraphProps) {
         linkDirectionalArrowLength={3.5}
         linkDirectionalArrowRelPos={1}
         linkCurvature={0.25}
-        linkLabel="label"
         cooldownTicks={100}
+        nodeLabel={nodeTitle}
+        linkTitle={linkTitle}
+        linkLabel={(link: VisGraphLink) => link.label}
+        onNodeHover={(node: VisGraphNode | null) => console.log('Node hover event:', node)}
+        onLinkHover={(link: VisGraphLink | null) => console.log('Link hover event:', link)}
       />
     </Card>
   );
