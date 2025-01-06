@@ -36,6 +36,16 @@ function isValidJson(str: string): boolean {
   }
 }
 
+function cleanModelResponse(response: string): string {
+  if (response.startsWith('```json\n') && response.endsWith('\n```')) {
+    return response.slice(8, -4); // Remove ```json\n from start and \n``` from end
+  }
+  if (response.startsWith('```') && response.endsWith('```')) {
+    return response.slice(3, -3); // Remove ``` from start and end
+  }
+  return response;
+}
+
 interface ExperimentDetailsDialogProps {
   experiment: Experiment | null;
   experimentDetails?: ExperimentDetails | null;
@@ -256,7 +266,7 @@ export function ExperimentDetailsDialog({
                               .map(key => key.split('_')[0])
                           )).map((model, index) => (
                             <TableCell key={index} className="align-top pt-4">
-                              {isValidJson(experimentDetails.outputs[`${model}_response`]) ? (
+                              {isValidJson(cleanModelResponse(experimentDetails.outputs[`${model}_response`])) ? (
                                 <Tabs defaultValue="json" className="w-full">
                                   <TabsList className="w-full justify-start">
                                     <TabsTrigger value="json">JSON</TabsTrigger>
@@ -264,13 +274,13 @@ export function ExperimentDetailsDialog({
                                   </TabsList>
                                   <TabsContent value="json">
                                     <pre className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap overflow-auto max-h-[400px]">
-                                      {JSON.stringify(JSON.parse(experimentDetails.outputs[`${model}_response`].trim()), null, 2)}
+                                      {JSON.stringify(JSON.parse(cleanModelResponse(experimentDetails.outputs[`${model}_response`]).trim()), null, 2)}
                                     </pre>
                                   </TabsContent>
                                   <TabsContent value="graph">
                                     <div className="border rounded-md p-4">
                                       <JsonGraph 
-                                        data={JSON.parse(experimentDetails.outputs[`${model}_response`].trim())}
+                                        data={JSON.parse(cleanModelResponse(experimentDetails.outputs[`${model}_response`]).trim())}
                                         height={400}
                                         width={600}
                                       />
@@ -279,7 +289,7 @@ export function ExperimentDetailsDialog({
                                 </Tabs>
                               ) : (
                                 <div className="bg-muted/50 p-2 rounded-md whitespace-pre-wrap">
-                                  {experimentDetails.outputs[`${model}_response`]}
+                                  {cleanModelResponse(experimentDetails.outputs[`${model}_response`])}
                                 </div>
                               )}
                             </TableCell>
