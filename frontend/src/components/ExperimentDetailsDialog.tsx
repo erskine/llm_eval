@@ -260,6 +260,50 @@ export function ExperimentDetailsDialog({
                           ))}
                         </TableRow>
                         <TableRow>
+                          <TableCell className="font-medium">Node Count</TableCell>
+                          {Array.from(new Set(
+                            Object.keys(experimentDetails.outputs)
+                              .map(key => key.split('_')[0])
+                          )).map((model, index) => (
+                            <TableCell key={index}>
+                              {experimentDetails.outputs[`${model}_node_count`] || 'N/A'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Relationship Count</TableCell>
+                          {Array.from(new Set(
+                            Object.keys(experimentDetails.outputs)
+                              .map(key => key.split('_')[0])
+                          )).map((model, index) => (
+                            <TableCell key={index}>
+                              {experimentDetails.outputs[`${model}_relationship_count`] || 'N/A'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Node Property Count</TableCell>
+                          {Array.from(new Set(
+                            Object.keys(experimentDetails.outputs)
+                              .map(key => key.split('_')[0])
+                          )).map((model, index) => (
+                            <TableCell key={index}>
+                              {experimentDetails.outputs[`${model}_node_property_count`] || 'N/A'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Relationship Property Count</TableCell>
+                          {Array.from(new Set(
+                            Object.keys(experimentDetails.outputs)
+                              .map(key => key.split('_')[0])
+                          )).map((model, index) => (
+                            <TableCell key={index}>
+                              {experimentDetails.outputs[`${model}_relationship_property_count`] || 'N/A'}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                        <TableRow>
                           <TableCell className="font-medium align-top pt-4">Response</TableCell>
                           {Array.from(new Set(
                             Object.keys(experimentDetails.outputs)

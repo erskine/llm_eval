@@ -3,11 +3,13 @@ from typing import List, Dict, Optional
 import time
 import aisuite as ai
 import logging
+import json
 
 from persistence import schemas
 from persistence.models import ExperimentRun, Parameter, ExperimentOutput
 from persistence import crud
 from ..utils.token_counter import count_tokens
+from ..utils.graph_analyzer import GraphAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +68,7 @@ class ExperimentService:
                     
                     logger.info(f"Output tokens for {model}: {output_tokens}")
                     
-                    # Save outputs to database
+                    # Initialize base outputs
                     outputs = [
                         ExperimentOutput(
                             output_name=f"{model}_response",
@@ -94,6 +96,28 @@ class ExperimentService:
                             output_datatype="int"
                         ),
                     ]
+                    
+                    # Analyze graph metrics
+                    try:
+                        graph_data = json.loads(output_text)
+                        graph_metrics = GraphAnalyzer.analyze_graph(graph_data)
+                        
+                        # Add graph metric outputs
+                        graph_outputs = [
+                            ExperimentOutput(
+                                output_name=f"{model}_{metric_name}",
+                                output_value=str(metric_value),
+                                output_datatype="int"
+                            )
+                            for metric_name, metric_value in graph_metrics.items()
+                        ]
+                        outputs.extend(graph_outputs)
+                    except json.JSONDecodeError:
+                        logger.warning(f"Could not parse JSON response from {model}")
+                    except Exception as graph_error:
+                        logger.warning(f"Error analyzing graph metrics for {model}: {str(graph_error)}")
+                    
+                    # Save all outputs to database
                     db_experiment.outputs.extend(outputs)
                     
                     # Create result dictionary
