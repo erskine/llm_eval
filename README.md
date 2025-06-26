@@ -76,6 +76,9 @@ Before you dive in, you'll need:
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
 
+6. If all goes well, you should see a handy interface for starting your experiments. 
+   ![Screenshot: Create Experiment UI](docs/images/create_experiment.png)
+
 ## Development
 
 You have two (and eventually three) ways to run this project (because we believe in choices):
