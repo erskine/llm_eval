@@ -35,11 +35,12 @@ const formSchema = z.object({
 })
 
 const AVAILABLE_MODELS = [
-    "anthropic:claude-3-5-haiku-20241022",
-    "anthropic:claude-3-5-sonnet-20241022",
+    "anthropic:claude-4-sonnet-20250514",
+    "anthropic:claude-4-opus-20250514",
 //    "google:gemini-1.5-flash:generateContent",
-    "openai:gpt-4o",
-    "openai:gpt-4o-mini"
+    "openai:gpt-4.1",
+    "openai:gpt-4.1-mini",
+    "openai:o4-mini"
 ] as const
 
 type ExperimentStatus = "idle" | "running" | "complete" | "error"
