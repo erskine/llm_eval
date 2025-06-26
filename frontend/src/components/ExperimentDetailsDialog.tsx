@@ -37,12 +37,12 @@ function isValidJson(str: string): boolean {
 }
 
 function cleanModelResponse(response: string): string {
-  if (response.startsWith('```json\n') && response.endsWith('\n```')) {
-    return response.slice(8, -4); // Remove ```json\n from start and \n``` from end
-  }
-  if (response.startsWith('```') && response.endsWith('```')) {
-    return response.slice(3, -3); // Remove ``` from start and end
-  }
+  // if (response.startsWith('```json\n') && response.endsWith('\n```')) {
+  //   return response.slice(8, -4); // Remove ```json\n from start and \n``` from end
+  // }
+  // if (response.startsWith('```') && response.endsWith('```')) {
+  //   return response.slice(3, -3); // Remove ``` from start and end
+  // }
   return response;
 }
 
